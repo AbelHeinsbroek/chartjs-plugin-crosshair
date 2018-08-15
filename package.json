@@ -1,0 +1,26 @@
+{
+  "name": "chartjs-plugin-trace",
+  "version": "1.0.1",
+  "description": "Chart.js trace line plugin",
+  "main": "src/chartjs-plugin-trace.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AbelHeinsbroek/chartjs-plugin-trace.git"
+  },
+  "keywords": [
+    "chart.js",
+    "plugin",
+    "trace",
+    "line",
+    "interpolate"
+  ],
+  "author": "Abel Heinsbroek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AbelHeinsbroek/chartjs-plugin-trace/issues"
+  },
+  "homepage": "https://github.com/AbelHeinsbroek/chartjs-plugin-trace#readme"
+}
