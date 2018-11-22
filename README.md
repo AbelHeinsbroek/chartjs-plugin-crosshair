@@ -1,6 +1,8 @@
+<!--
 <div align="center">
     <img src="docs/assets/banner.png"/>
 </div>
+-->
 
 [Chart.js](http://www.chartjs.org/) plugin to draw trace lines, zoom, interpolate values and sync chart interactions.
 
