@@ -85,7 +85,7 @@ gulp.task('samples', function() {
 	// since we moved the dist files one folder up (package root), we need to rewrite
 	// samples src="../dist/ to src="../ and then copy them in the /samples directory.
 	var out = path.join(argv.output, argv.samplesDir);
-	return gulp.src('samples/**/*', {base: 'samples'})
+	return gulp.src('samples/*', {})
 		.pipe(streamify(replace(/src="((?:\.\.\/)+)dist\//g, 'src="$1', {skipBinary: true})))
 		.pipe(gulp.dest(out));
 });
