@@ -29,7 +29,7 @@ new Chart(ctx, {
       trace: {
         tracer: {
           color: '#F66',  // trace line color
-          width:          // trace line width
+          width: 1        // trace line width
         },
         sync: {
           enabled: true,            // enable trace line syncing with other charts
