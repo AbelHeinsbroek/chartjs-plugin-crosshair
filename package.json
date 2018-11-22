@@ -1,26 +1,35 @@
 {
   "name": "chartjs-plugin-trace",
-  "version": "1.0.1",
-  "description": "Chart.js trace line plugin",
-  "main": "src/chartjs-plugin-trace.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "homepage": "https://chartjs-plugin-trace.netlify.com",
+  "description": "Chart.js plugin to draw and sync trace lines",
+  "version": "1.0.6",
+  "license": "MIT",
+  "main": "dist/chartjs-plugin-trace.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AbelHeinsbroek/chartjs-plugin-trace.git"
+    "url": "https://github.com/abelheinsbroek/chartjs-plugin-trace.git"
   },
-  "keywords": [
-    "chart.js",
-    "plugin",
-    "trace",
-    "line",
-    "interpolate"
-  ],
-  "author": "Abel Heinsbroek",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/AbelHeinsbroek/chartjs-plugin-trace/issues"
+  "devDependencies": {
+    "eslint-config-chartjs": "^0.1.0",
+    "gitbook-cli": "^2.3.2",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.1",
+    "gulp-file": "^0.4.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
+    "gulp-streamify": "^1.0.2",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.7",
+    "gulp-zip": "^4.1.0",
+    "merge2": "^1.2.1",
+    "mz": "^2.7.0",
+    "path": "^0.12.7",
+    "rollup": "^0.53.4",
+    "rollup-stream": "^1.24.1",
+    "vinyl-source-stream": "^2.0.0",
+    "yargs": "^10.1.1"
   },
-  "homepage": "https://github.com/AbelHeinsbroek/chartjs-plugin-trace#readme"
+  "peerDependencies": {
+    "chart.js": ">= 2.6.0 < 3"
+  }
 }
