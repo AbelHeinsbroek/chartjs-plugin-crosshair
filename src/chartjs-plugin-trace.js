@@ -1,36 +1,24 @@
-// Get the chart variable
-Chart = typeof Chart === 'function' ? Chart : window.Chart;
+//import Chart from 'chart.js'
 
 var helpers = Chart.helpers
 
+var defaultOptions = {
+	callbacks: {
+		beforeZoom: function(start, end) {
+			return true
+		},
+		afterZoom: function(start, end) {
+		}
+	}
+}
 
 var tracePlugin = {
 
   afterInit: function(chart) {
 
-    /*
-    chart.hammer = new Hammer(chart.canvas, {})
-
-    chart.hammer.on('pan', function(e) {
-      console.log(e.pointerType)
-      if(e.pointerType === 'touch') {
-
-        var xScale = chart.scales['x-axis-0']
-
-        var srcEvent = e.srcEvent
-
-        var newEvent = {
-          type: 'mouseover',
-          chart: chart,
-          x: e.center.x,
-          y: 0,
-          native: true,
-          stop: false
-        }
-        chart.controller.eventHandler(newEvent)
-      }
-    })
-    */
+		if (chart.options.trace === undefined) {
+			chart.options.trace = defaultOptions
+		}
 
     chart.tracer = {
       enabled: false,
@@ -66,9 +54,16 @@ var tracePlugin = {
     window.removeEventListener('reset-zoom-event', chart.tracer.resetZoomEventHandler)
   },
 
+	getXScale: function(chart) {
+		return chart.scales[chart.getDatasetMeta(0).xAxisID]
+	},
+	getYScale: function(chart) {
+		return chart.scales[chart.getDatasetMeta(0).yAxisID]
+	},
+
   handleSyncEvent: function(chart, e) {
 
-     var xScale = chart.scales['x-axis-0']
+     var xScale = this.getXScale(chart)
 
      if(e.chartId == chart.id) {
        return
@@ -95,7 +90,9 @@ var tracePlugin = {
 
   afterEvent: function(chart, e) {
 
-    var xScale = chart.scales['x-axis-0'];
+		// fix this
+	  var xScale = this.getXScale(chart);
+    var yScale = this.getYScale(chart);
 
     // fix for Safari
     var buttons = (e.native.buttons === undefined ? e.native.which : e.native.buttons);
@@ -118,7 +115,6 @@ var tracePlugin = {
 
     chart.tracer.enabled = (e.type != 'mouseout' && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max))) 
 
-
     if(!chart.tracer.enabled) {
       if(e.x > xScale.getPixelForValue(xScale.max)) { chart.update() }
       return true
@@ -140,9 +136,6 @@ var tracePlugin = {
       if(Math.abs(chart.tracer.dragStartX - chart.tracer.x) > 1) {
         this.doZoom(chart, start, end)
       }
-      chart.animation = false
-      var anim = chart.options.animation
-      chart.options.animation = false
       chart.update()
     }
 
@@ -184,18 +177,23 @@ var tracePlugin = {
         dataset.data = chart.tracer.originalData.shift(0)
       }
 
+			var range = "ticks"
+
+			if(chart.options.scales.xAxes[0].time) {
+				range = "time"
+			}
       // reset original xRange
       if(chart.tracer.originalXRange.min) {
-        chart.options.scales.xAxes[0].time.min = chart.tracer.originalXRange.min
+				chart.options.scales.xAxes[0][range].min = chart.tracer.originalXRange.min
         chart.tracer.originalXRange.min = null
       } else {
-        delete chart.options.scales.xAxes[0].time.min
+				delete chart.options.scales.xAxes[0][range].min
       }
       if(chart.tracer.originalXRange.max) {
-        chart.options.scales.xAxes[0].time.max = chart.tracer.originalXRange.max
+				chart.options.scales.xAxes[0][range].max = chart.tracer.originalXRange.max
         chart.tracer.originalXRange.max = null
       } else {
-        delete chart.options.scales.xAxes[0].time.max
+				delete chart.options.scales.xAxes[0][range].max
       }
     }
 
@@ -211,23 +209,49 @@ var tracePlugin = {
       window.dispatchEvent(event)
     }
     if(update) {
+			var anim = chart.options.animation
+      chart.options.animation = false
       chart.update()
+      chart.options.animation = anim
     }
   },
 
   doZoom: function(chart, start, end) {
 
+    // swap start/end if user dragged from right to left
+    if(start > end) {
+      var tmp = start
+      start = end
+      end = tmp
+    }
+
     // notify delegate
-    if (!chart.options.trace.beforeZoom()) {
+		var beforeZoomCallback = helpers.getValueOrDefault(chart.options.trace.callbacks ? chart.options.trace.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom)
+
+    if (!beforeZoomCallback(start, end)) {
       return false
     }
 
-    if(chart.options.scales.xAxes[0].time.min && chart.tracer.originalXRange.min == null) {
-      chart.tracer.originalXRange.min = chart.options.scales.xAxes[0].time.min
-    }
-    if(chart.options.scales.xAxes[0].time.max && chart.tracer.originalXRange.max == null) {
-      chart.tracer.originalXRange.max = chart.options.scales.xAxes[0].time.max
-    }
+		if(chart.options.scales.xAxes[0].type == 'time') {
+
+			if(chart.options.scales.xAxes[0].time.min && chart.tracer.originalData.length == 0) {
+				chart.tracer.originalXRange.min = chart.options.scales.xAxes[0].time.min
+			}
+			if(chart.options.scales.xAxes[0].time.max && chart.tracer.originalData.length == 0) {
+				chart.tracer.originalXRange.max = chart.options.scales.xAxes[0].time.max
+			}
+
+		} else {
+
+			if(chart.options.scales.xAxes[0].ticks.min && chart.tracer.originalData.length == undefined) {
+				chart.tracer.originalXRange.min = chart.options.scales.xAxes[0].ticks.min
+			}
+			if(chart.options.scales.xAxes[0].ticks.max && chart.tracer.originalData.length == undefined) {
+				chart.tracer.originalXRange.max = chart.options.scales.xAxes[0].ticks.max
+			}
+
+
+		}
 
     if(!chart.tracer.button) {
       // add restore zoom button
@@ -240,18 +264,17 @@ var tracePlugin = {
       chart.tracer.button = button
     }
 
-    var xScale = chart.scales['x-axis-0']
+    var xScale = this.getXScale(chart)
 
-    // swap start/end if user dragged from right to left
-    if(start > end) {
-      var tmp = start
-      start = end
-      end = tmp
-    }
 
     // set axis scale
-    chart.options.scales.xAxes[0].time.min = start
-    chart.options.scales.xAxes[0].time.max = end
+		if(chart.options.scales.xAxes[0].time) {
+			chart.options.scales.xAxes[0].time.min = start
+			chart.options.scales.xAxes[0].time.max = end
+		} else {
+			chart.options.scales.xAxes[0].ticks.min = start
+			chart.options.scales.xAxes[0].ticks.max = end
+		}
 
     // make a copy of the original data for later restoration
     var storeOriginals = (chart.tracer.originalData.length == 0) ? true : false
@@ -294,12 +317,16 @@ var tracePlugin = {
     }
 
     chart.update()
-    chart.options.trace.afterZoom(start, end)
 
+		var afterZoomCallback = helpers.getValueOrDefault(chart.options.trace.callbacks ? chart.options.trace.callbacks.afterZoom : undefined, defaultOptions.callbacks.afterZoom)
+
+		afterZoomCallback()
   },
 
   drawZoombox: function(chart) {
-    var yScale = chart.scales['y-axis-0'];
+
+    var yScale = this.getYScale(chart);
+
     chart.ctx.beginPath()
     chart.ctx.rect(chart.tracer.dragStartX, yScale.getPixelForValue(yScale.max), chart.tracer.x - chart.tracer.dragStartX, yScale.getPixelForValue(yScale.min)-yScale.getPixelForValue(yScale.max))
     chart.ctx.lineWidth = 1
@@ -313,7 +340,7 @@ var tracePlugin = {
 
   drawTraceLine: function(chart) {
 
-    var yScale = chart.scales['y-axis-0'];
+    var yScale = this.getYScale(chart);
 
     chart.ctx.beginPath();
     chart.ctx.moveTo(chart.tracer.x, yScale.getPixelForValue(yScale.max));
@@ -326,14 +353,14 @@ var tracePlugin = {
 
   drawTracePoints: function(chart) {
 
-    var yScale = chart.scales['y-axis-0'];
-
     for(var chartIndex in chart.data.datasets) {
-      // 
+
       var dataset = chart.data.datasets[chartIndex]
       var meta = chart.getDatasetMeta(chartIndex)
+
+			var yScale = chart.scales[meta.yAxisID]
       
-      if(meta.hidden || !dataset.interpolate) {
+      if(meta.hidden || !dataset.showLine) {
         continue
       }
 
@@ -351,16 +378,16 @@ var tracePlugin = {
 
   interpolateValues: function(chart) {
 
-    var xScale = chart.scales['x-axis-0'];
-    var xValue = xScale.getValueForPixel(chart.tracer.x)
-
     for(var chartIndex in chart.data.datasets) {
 
       var dataset = chart.data.datasets[chartIndex]
 
       var meta = chart.getDatasetMeta(chartIndex)
 
-      if(meta.hidden || !dataset.interpolate) {
+			var xScale = chart.scales[meta.xAxisID]
+			var xValue = xScale.getValueForPixel(chart.tracer.x)
+
+      if(meta.hidden || !dataset.showLine) {
         continue
       }
 
@@ -374,7 +401,9 @@ var tracePlugin = {
       } else if(prev && next) {
         var slope = (next.y-prev.y)/(next.x-prev.x)
         dataset.interpolatedValue = prev.y + (xValue - prev.x) * slope
-      }
+      } else {
+        dataset.interpolatedValue = NaN
+			}
     }
 
   }
