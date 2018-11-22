@@ -21,6 +21,10 @@ new Chart(ctx, {
   // ... data ...
   options: {
     // ... other options ...
+    tooltips: {
+      mode: 'interpolate',
+      intersect: false
+    },
     plugins: {
 			trace: {
         tracer: {
