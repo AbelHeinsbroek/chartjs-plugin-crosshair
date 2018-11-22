@@ -26,7 +26,7 @@ new Chart(ctx, {
       intersect: false
     },
     plugins: {
-			trace: {
+      trace: {
         tracer: {
           color: '#F66',  // trace line color
           width:          // trace line width
