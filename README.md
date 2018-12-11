@@ -10,9 +10,9 @@ Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or l
 
 ## Documentation
 
-- [Installation](https://chartjs-plugin-trace.netlify.com/installation)
-- [Options](https://chartjs-plugin-trace.netlify.com/options)
-- [Samples](https://chartjs-plugin-trace.netlify.com/samples)
+- [Installation](https://chartjs-plugin-crosshair.netlify.com/installation)
+- [Options](https://chartjs-plugin-crosshair.netlify.com/options)
+- [Samples](https://chartjs-plugin-crosshair.netlify.com/samples)
 
 ## Example
 
@@ -26,10 +26,10 @@ new Chart(ctx, {
       intersect: false
     },
     plugins: {
-      trace: {
-        tracer: {
-          color: '#F66',  // trace line color
-          width: 1        // trace line width
+      crosshair: {
+        line: {
+          color: '#F66',  // crosshair line color
+          width: 1        // crosshair line width
         },
         sync: {
           enabled: true,            // enable trace line syncing with other charts
