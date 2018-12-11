@@ -1,13 +1,13 @@
 {
-  "name": "chartjs-plugin-trace",
-  "homepage": "https://chartjs-plugin-trace.netlify.com",
-  "description": "Chart.js plugin to draw and sync trace lines",
-  "version": "1.0.6",
+  "name": "chartjs-plugin-crosshair",
+  "homepage": "https://chartjs-plugin-crosshair.netlify.com",
+  "description": "Chart.js plugin to draw and sync vertical crosshair lines",
+  "version": "1.0.8",
   "license": "MIT",
   "main": "dist/chartjs-plugin-trace.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abelheinsbroek/chartjs-plugin-trace.git"
+    "url": "https://github.com/abelheinsbroek/chartjs-plugin-crosshair.git"
   },
   "devDependencies": {
     "eslint-config-chartjs": "^0.1.0",

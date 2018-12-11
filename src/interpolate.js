@@ -2,6 +2,7 @@ export default function(Chart) {
 
 	Chart.Interaction.modes.interpolate = function(chart, e, options) {
 
+
 		var items = [];
 
 		for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {

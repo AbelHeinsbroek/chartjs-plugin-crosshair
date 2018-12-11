@@ -112,7 +112,7 @@ gulp.task('netlify', ['build', 'docs', 'samples'], function() {
 	);
 
 	return streams
-		.pipe(streamify(replace(/https?:\/\/chartjs-plugin-trace\.netlify\.com\/?/g, '/', {skipBinary: true})))
+		.pipe(streamify(replace(/https?:\/\/chartjs-plugin-crosshair\.netlify\.com\/?/g, '/', {skipBinary: true})))
 		.pipe(gulp.dest(out));
 });
 
