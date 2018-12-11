@@ -4,7 +4,7 @@
 </div>
 -->
 
-[Chart.js](http://www.chartjs.org/) plugin to draw trace lines, zoom, interpolate values and sync chart interactions.
+[Chart.js](http://www.chartjs.org/) plugin to draw vertical crosshair, zoom, interpolate values and sync chart interactions.
 
 Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or later.
 
