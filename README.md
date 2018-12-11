@@ -74,4 +74,4 @@ The following commands will then be available from the repository root:
 
 ## License
 
-`chartjs-plugin-trace` is available under the [MIT license](LICENSE.md).
+`chartjs-plugin-crosshair` is available under the [MIT license](LICENSE.md).
