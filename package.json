@@ -2,9 +2,9 @@
   "name": "chartjs-plugin-crosshair",
   "homepage": "https://chartjs-plugin-crosshair.netlify.com",
   "description": "Chart.js plugin to draw and sync vertical crosshair lines",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "license": "MIT",
-  "main": "dist/chartjs-plugin-trace.js",
+  "main": "dist/chartjs-plugin-crosshair.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/abelheinsbroek/chartjs-plugin-crosshair.git"
