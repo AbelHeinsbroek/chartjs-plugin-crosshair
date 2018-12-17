@@ -1,8 +1,10 @@
-<!--
+
 <div align="center">
-    <img src="docs/assets/banner.png"/>
+    <centering>
+    <img src="header.png" width='600px'/>
+    </centering>
 </div>
--->
+
 
 [Chart.js](http://www.chartjs.org/) plugin to draw vertical crosshair, zoom, interpolate values and sync chart interactions.
 
