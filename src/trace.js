@@ -24,9 +24,6 @@ export default function(Chart) {
 			},
 			afterZoom: function(start, end) {
 			}
-		},
-		pan: {
-			incrementer: 5,
 		}
 	};
 
@@ -77,8 +74,7 @@ export default function(Chart) {
 				window.addEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
 			}
 
-			chart.panZoomLeft = this.panZoom.bind(this, chart, true);
-			chart.panZoomRight = this.panZoom.bind(this, chart, false);
+			chart.panZoom = this.panZoom.bind(this, chart);
 		},
 
 		destroy: function(chart) {
@@ -89,20 +85,22 @@ export default function(Chart) {
 			}
 		},
 
-		panZoom: function(chart, left) {
+		panZoom: function(chart, increment) {
 			if (chart.crosshair.originalData.length === 0) {
 				return;
 			}
-			var panIncrementer = this.getOption(chart, 'pan', 'incrementer');
+			if (typeof increment !== 'number') {
+				throw new Error('chartjs-plugin-crosshair does not support non-number increments');
+			}
 			var diff = chart.crosshair.end - chart.crosshair.start;
 			var min = chart.crosshair.min;
 			var max = chart.crosshair.max;
-			if (left) {
-				chart.crosshair.start = Math.max(chart.crosshair.start - panIncrementer, min);
-				chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end - panIncrementer;
-			} else {
-				chart.crosshair.end = Math.min(chart.crosshair.end + panIncrementer, chart.crosshair.max);
-				chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + panIncrementer;
+			if (increment < 0) { // left
+				chart.crosshair.start = Math.max(chart.crosshair.start + increment, min);
+				chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end + increment;
+			} else { // right
+				chart.crosshair.end = Math.min(chart.crosshair.end + increment, chart.crosshair.max);
+				chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + increment;
 			}
 
 			this.doZoom(chart, chart.crosshair.start, chart.crosshair.end);
@@ -113,7 +111,7 @@ export default function(Chart) {
 		},
 
 		getXScale: function(chart) {
-			return chart.scales[chart.getDatasetMeta(0).xAxisID];
+			return chart.data.datasets.length ? chart.scales[chart.getDatasetMeta(0).xAxisID] : null;
 		},
 		getYScale: function(chart) {
 			return chart.scales[chart.getDatasetMeta(0).yAxisID];
@@ -134,6 +132,10 @@ export default function(Chart) {
 			}
 
 			var xScale = this.getXScale(chart);
+
+			if (!xScale) {
+				return;
+			}
 
 			// Safari fix
 			var buttons = (e.original.native.buttons === undefined ? e.original.native.which : e.original.native.buttons);
@@ -161,6 +163,12 @@ export default function(Chart) {
 			}
 
 			var xScale = this.getXScale(chart);
+
+
+			if (!xScale) {
+				return;
+			}
+
 
 			// fix for Safari
 			var buttons = (e.native.buttons === undefined ? e.native.which : e.native.buttons);
