@@ -24,6 +24,9 @@ export default function(Chart) {
 			},
 			afterZoom: function(start, end) {
 			}
+		},
+		pan: {
+			incrementer: 5,
 		}
 	};
 
@@ -74,6 +77,8 @@ export default function(Chart) {
 				window.addEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
 			}
 
+			chart.panZoomLeft = this.panZoom.bind(this, chart, true);
+			chart.panZoomRight = this.panZoom.bind(this, chart, false);
 		},
 
 		destroy: function(chart) {
@@ -82,6 +87,25 @@ export default function(Chart) {
 				window.removeEventListener('sync-event', chart.crosshair.syncEventHandler);
 				window.removeEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
 			}
+		},
+
+		panZoom: function(chart, left) {
+			if (chart.crosshair.originalData.length === 0) {
+				return;
+			}
+			var panIncrementer = this.getOption(chart, 'pan', 'incrementer');
+			var diff = chart.crosshair.end - chart.crosshair.start;
+			var min = chart.crosshair.min;
+			var max = chart.crosshair.max;
+			if (left) {
+				chart.crosshair.start = Math.max(chart.crosshair.start - panIncrementer, min);
+				chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end - panIncrementer;
+			} else {
+				chart.crosshair.end = Math.min(chart.crosshair.end + panIncrementer, chart.crosshair.max);
+				chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + panIncrementer;
+			}
+
+			this.doZoom(chart, chart.crosshair.start, chart.crosshair.end);
 		},
 
 		getOption: function(chart, category, name) {
@@ -341,40 +365,49 @@ export default function(Chart) {
 
 			// make a copy of the original data for later restoration
 			var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
-
 			// filter dataset
 			for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
-				var dataset = chart.data.datasets[datasetIndex];
 				var newData = [];
 
 				var index = 0;
 				var started = false;
 				var stop = false;
-
 				if (storeOriginals) {
-					chart.crosshair.originalData[datasetIndex] = dataset.data;
+					chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data;
 				}
 
-				for (var oldDataIndex = 0; oldDataIndex < dataset.data.length; oldDataIndex++) {
+				var sourceDataset = chart.crosshair.originalData[datasetIndex];
 
-					var oldData = dataset.data[oldDataIndex];
+				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
+
+					var oldData = sourceDataset[oldDataIndex];
 
 					// append one value outside of bounds
 					if (oldData.x >= start && !started && index > 0) {
-						newData.push(dataset.data[index - 1]);
+						newData.push(sourceDataset[index - 1]);
 						started = true;
 					}
 					if (oldData.x >= start && oldData.x <= end) {
 						newData.push(oldData);
 					}
-					if (oldData.x > end && !stop && index < dataset.data.length) {
+					if (oldData.x > end && !stop && index < sourceDataset.length) {
 						newData.push(oldData);
 						stop = true;
 					}
 					index += 1;
 				}
-				dataset.data = newData;
+
+				chart.data.datasets[datasetIndex].data = newData;
+			}
+
+			chart.crosshair.start = start;
+			chart.crosshair.end = end;
+
+			if (storeOriginals) {
+				var xAxes = this.getXScale(chart);
+				chart.crosshair.min = xAxes.min;
+				chart.crosshair.max = xAxes.max;
 			}
 
 			chart.update();
