@@ -89,9 +89,6 @@ export default function(Chart) {
 			if (chart.crosshair.originalData.length === 0) {
 				return;
 			}
-			if (typeof increment !== 'number') {
-				throw new Error('chartjs-plugin-crosshair does not support non-number increments');
-			}
 			var diff = chart.crosshair.end - chart.crosshair.start;
 			var min = chart.crosshair.min;
 			var max = chart.crosshair.max;
