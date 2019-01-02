@@ -1,174 +1,227 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>chartjs-plugin-trace / sample</title>
-	<link rel="stylesheet" type="text/css" href="index.css">
-	<link rel="icon" type="image/ico" href="favicon.ico">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>chartjs-plugin-trace / sample</title>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.1/dist/Chart.min.js"></script>
-  <script src="../dist/chartjs-plugin-crosshair.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.1/dist/Chart.min.js"></script>
+    <script src="../dist/chartjs-plugin-crosshair.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      <div class="title">
+        <span class="main">chartjs-plugin-crosshair</span>
+        <span class="name">Sample</span>
+      </div>
+      <div class="caption">
+        <a href="http://www.chartjs.org">Chart.js</a>
+        plugin to draw crosshair lines, interpolate values and zoom
+      </div>
+      <div class="links">
+        <a
+          class="btn btn-docs"
+          href="https://chartjs-plugin-crosshair.netlify.com"
+        >
+          Documentation
+        </a>
+        <a
+          class="btn btn-gh"
+          href="https://github.com/abelheinsbroek/chartjs-plugin-crosshair"
+        >
+          GitHub
+        </a>
+      </div>
+    </div>
+    <h3>Basic Example</h3>
+    <p>Try dragging to zoom in!</p>
+    <div class="chart"><canvas id="chart1"></canvas></div>
+    <h3>Linked Charts</h3>
+    <div class="split"><canvas id="chart2"></canvas></div>
+    <div class="split"><canvas id="chart3"></canvas></div>
+    <div class="chart"><canvas id="chart4"></canvas></div>
+    <h3>Panning Zoom</h3>
+    <p>Use left and right arrows to pan!</p>
+    <div class="chart"><canvas id="chart5"></canvas></div>
+  </body>
 
-</head>
-<body>
-	<div id="header">
-		<div class="title">
-			<span class="main">chartjs-plugin-crosshair</span>
-			<span class="name">Sample</span>
-		</div>
-		<div class="caption"><a href="http://www.chartjs.org">Chart.js</a> plugin to draw crosshair lines, interpolate values and zoom</div>
-		<div class="links">
-			<a class="btn btn-docs" href="https://chartjs-plugin-crosshair.netlify.com">Documentation</a>
-			<a class="btn btn-gh" href="https://github.com/abelheinsbroek/chartjs-plugin-crosshair">GitHub</a>
-		</div>
-	</div>
-	<h3>Basic Example</h3>
-	<p>Try dragging to zoom in!</p>
-	<div class='chart'>
-		<canvas id='chart1'></canvas>
-	</div>
-	<h3>Linked Charts</h3>
-	<div class='split'>
-		<canvas id='chart2'></canvas>
-	</div>
-	<div class='split'>
-		<canvas id='chart3'></canvas>
-	</div>
-	<div class='chart'>
-		<canvas id='chart4'></canvas>
-	</div>
-
-</body>
-
-<script>
-
-  function generateDataset(shift, label, color) {
-    var data = []
-    var x = 0
-    while (x < 30) {
-      data.push({'x':x,'y':Math.sin(shift+x/3)})
-      x+= Math.random()
+  <script>
+    function generateDataset(shift, label, color) {
+      var data = [];
+      var x = 0;
+      while (x < 30) {
+        data.push({ x: x, y: Math.sin(shift + x / 3) });
+        x += Math.random();
+      }
+      var dataset = {
+        backgroundColor: color,
+        borderColor: color,
+        showLine: true,
+        fill: false,
+        pointRadius: 2,
+        label: label,
+        data: data,
+        lineTension: 0,
+        interpolate: true
+      };
+      return dataset;
     }
-    var dataset = {
-      backgroundColor: color,
-      borderColor: color,
-      showLine: true,
-      fill: false,
-			pointRadius: 2,
-      label: label,
-      data: data,
-      lineTension: 0,
-			interpolate: true
-    }
-    return dataset
-  }
 
-  var chart1 = new Chart(document.getElementById("chart1").getContext('2d'), {
-    type: 'scatter',
-    options: {
-			plugins: {
-				crosshair: {
-					sync: {
-						enabled: false
-					}
-				}
-			},
+    var chart1 = new Chart(document.getElementById("chart1").getContext("2d"), {
+      type: "scatter",
+      options: {
+        plugins: {
+          crosshair: {
+            sync: {
+              enabled: false
+            }
+          }
+        },
 
-      tooltips: {
-        mode: 'interpolate',
-        intersect: false,
-        callbacks: {
-          title: function(a,d) {
-            return a[0].xLabel.toFixed(2)
-          }, 
-          label: function(i,d) {
-            return d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+        tooltips: {
+          mode: "interpolate",
+          intersect: false,
+          callbacks: {
+            title: function(a, d) {
+              return a[0].xLabel.toFixed(2);
+            },
+            label: function(i, d) {
+              return (
+                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+              );
+            }
           }
         }
-      }
-    },
-    data: {
-
-      datasets: [
-        generateDataset(0, 'A', 'red'), 
-        generateDataset(1, 'B', 'green'),
-        generateDataset(2, 'C', 'blue'),
+      },
+      data: {
+        datasets: [
+          generateDataset(0, "A", "red"),
+          generateDataset(1, "B", "green"),
+          generateDataset(2, "C", "blue")
         ]
-    }
-  })
+      }
+    });
 
-  var chart2 = new Chart(document.getElementById("chart2").getContext('2d'), {
-    type: 'scatter',
-    options: {
-      tooltips: {
-        mode: 'interpolate',
-        intersect: false,
-        callbacks: {
-          title: function(a,d) {
-            return a[0].xLabel.toFixed(2)
-          }, 
-          label: function(i,d) {
-            return d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+    var chart2 = new Chart(document.getElementById("chart2").getContext("2d"), {
+      type: "scatter",
+      options: {
+        tooltips: {
+          mode: "interpolate",
+          intersect: false,
+          callbacks: {
+            title: function(a, d) {
+              return a[0].xLabel.toFixed(2);
+            },
+            label: function(i, d) {
+              return (
+                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+              );
+            }
           }
         }
+      },
+      data: {
+        datasets: [generateDataset(0, "A", "red")]
       }
-    },
-    data: {
-      datasets: [
-        generateDataset(0, 'A', 'red'), 
-        ]
-    }
-  })
-  var chart3 = new Chart(document.getElementById("chart3").getContext('2d'), {
-    type: 'scatter',
-    options: {
-      tooltips: {
-        mode: 'interpolate',
-        intersect: false,
-        callbacks: {
-          title: function(a,d) {
-            return a[0].xLabel.toFixed(2)
-          }, 
-          label: function(i,d) {
-            return d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+    });
+    var chart3 = new Chart(document.getElementById("chart3").getContext("2d"), {
+      type: "scatter",
+      options: {
+        tooltips: {
+          mode: "interpolate",
+          intersect: false,
+          callbacks: {
+            title: function(a, d) {
+              return a[0].xLabel.toFixed(2);
+            },
+            label: function(i, d) {
+              return (
+                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+              );
+            }
           }
         }
+      },
+      data: {
+        datasets: [generateDataset(1, "B", "green")]
       }
-    },
-    data: {
-      datasets: [
-        generateDataset(1, 'B', 'green'), 
-        ]
-    }
-  })
-  var chart4 = new Chart(document.getElementById("chart4").getContext('2d'), {
-    type: 'scatter',
-    options: {
-      tooltips: {
-        mode: 'interpolate',
-        intersect: false,
-        callbacks: {
-          title: function(a,d) {
-            return a[0].xLabel.toFixed(2)
-          }, 
-          label: function(i,d) {
-            return d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+    });
+    var chart4 = new Chart(document.getElementById("chart4").getContext("2d"), {
+      type: "scatter",
+      options: {
+        tooltips: {
+          mode: "interpolate",
+          intersect: false,
+          callbacks: {
+            title: function(a, d) {
+              return a[0].xLabel.toFixed(2);
+            },
+            label: function(i, d) {
+              return (
+                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+              );
+            }
           }
         }
+      },
+      data: {
+        datasets: [generateDataset(1, "C", "blue")]
       }
-    },
-    data: {
-      datasets: [
-        generateDataset(1, 'C', 'blue'), 
+    });
+
+    var chart5 = new Chart(document.getElementById("chart5").getContext("2d"), {
+      type: "scatter",
+      options: {
+        plugins: {
+          crosshair: {
+            sync: {
+              enabled: false
+            },
+            pan: {
+              incrementer: 3 // Defaults to 5 if not included.
+            }
+          }
+        },
+        tooltips: {
+          mode: "interpolate",
+          intersect: false,
+          callbacks: {
+            title: function(a, d) {
+              return a[0].xLabel.toFixed(2);
+            },
+            label: function(i, d) {
+              return (
+                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
+              );
+            }
+          }
+        },
+        animation: {
+          duration: 0
+        },
+
+        responsiveAnimationDuration: 0
+      },
+      data: {
+        datasets: [
+          generateDataset(0, "A", "red"),
+          generateDataset(1, "B", "green"),
+          generateDataset(2, "C", "blue")
         ]
-    }
-  })
+      }
+    });
 
+    var panZoom = function(e) {
+      if (e.keyCode === 37) {
+        chart5.panZoom(-5);
+      } else if (e.keyCode === 39) {
+        chart5.panZoom(5);
+      }
+    };
 
-
-
-</script>
-
+    window.addEventListener("keydown", panZoom);
+  </script>
 </html>

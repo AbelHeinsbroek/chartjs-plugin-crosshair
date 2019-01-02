@@ -74,6 +74,7 @@ export default function(Chart) {
 				window.addEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
 			}
 
+			chart.panZoom = this.panZoom.bind(this, chart);
 		},
 
 		destroy: function(chart) {
@@ -84,12 +85,30 @@ export default function(Chart) {
 			}
 		},
 
+		panZoom: function(chart, increment) {
+			if (chart.crosshair.originalData.length === 0) {
+				return;
+			}
+			var diff = chart.crosshair.end - chart.crosshair.start;
+			var min = chart.crosshair.min;
+			var max = chart.crosshair.max;
+			if (increment < 0) { // left
+				chart.crosshair.start = Math.max(chart.crosshair.start + increment, min);
+				chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end + increment;
+			} else { // right
+				chart.crosshair.end = Math.min(chart.crosshair.end + increment, chart.crosshair.max);
+				chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + increment;
+			}
+
+			this.doZoom(chart, chart.crosshair.start, chart.crosshair.end);
+		},
+
 		getOption: function(chart, category, name) {
 			return helpers.getValueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
 		},
 
 		getXScale: function(chart) {
-			return chart.scales[chart.getDatasetMeta(0).xAxisID];
+			return chart.data.datasets.length ? chart.scales[chart.getDatasetMeta(0).xAxisID] : null;
 		},
 		getYScale: function(chart) {
 			return chart.scales[chart.getDatasetMeta(0).yAxisID];
@@ -110,6 +129,10 @@ export default function(Chart) {
 			}
 
 			var xScale = this.getXScale(chart);
+
+			if (!xScale) {
+				return;
+			}
 
 			// Safari fix
 			var buttons = (e.original.native.buttons === undefined ? e.original.native.which : e.original.native.buttons);
@@ -137,6 +160,12 @@ export default function(Chart) {
 			}
 
 			var xScale = this.getXScale(chart);
+
+
+			if (!xScale) {
+				return;
+			}
+
 
 			// fix for Safari
 			var buttons = (e.native.buttons === undefined ? e.native.which : e.native.buttons);
@@ -341,40 +370,49 @@ export default function(Chart) {
 
 			// make a copy of the original data for later restoration
 			var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
-
 			// filter dataset
 			for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
-				var dataset = chart.data.datasets[datasetIndex];
 				var newData = [];
 
 				var index = 0;
 				var started = false;
 				var stop = false;
-
 				if (storeOriginals) {
-					chart.crosshair.originalData[datasetIndex] = dataset.data;
+					chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data;
 				}
 
-				for (var oldDataIndex = 0; oldDataIndex < dataset.data.length; oldDataIndex++) {
+				var sourceDataset = chart.crosshair.originalData[datasetIndex];
 
-					var oldData = dataset.data[oldDataIndex];
+				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
+
+					var oldData = sourceDataset[oldDataIndex];
 
 					// append one value outside of bounds
 					if (oldData.x >= start && !started && index > 0) {
-						newData.push(dataset.data[index - 1]);
+						newData.push(sourceDataset[index - 1]);
 						started = true;
 					}
 					if (oldData.x >= start && oldData.x <= end) {
 						newData.push(oldData);
 					}
-					if (oldData.x > end && !stop && index < dataset.data.length) {
+					if (oldData.x > end && !stop && index < sourceDataset.length) {
 						newData.push(oldData);
 						stop = true;
 					}
 					index += 1;
 				}
-				dataset.data = newData;
+
+				chart.data.datasets[datasetIndex].data = newData;
+			}
+
+			chart.crosshair.start = start;
+			chart.crosshair.end = end;
+
+			if (storeOriginals) {
+				var xAxes = this.getXScale(chart);
+				chart.crosshair.min = xAxes.min;
+				chart.crosshair.max = xAxes.max;
 			}
 
 			chart.update();
