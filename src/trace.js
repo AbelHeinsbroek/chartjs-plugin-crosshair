@@ -33,7 +33,15 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.type !== 'scatter' && chart.config.type !== 'line') {
+
+			if (chart.config.options.scales.xAxes.length == 0) {
+				return
+			}
+
+
+			var xScaleType = chart.config.options.scales.xAxes[0].type
+
+			if (xScaleType !== 'linear' && xScaleType !== 'time') {
 				return;
 			}
 
@@ -155,7 +163,14 @@ export default function(Chart) {
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.type !== 'scatter' && chart.config.type !== 'line') {
+			if (chart.config.options.scales.xAxes.length == 0) {
+				return
+			}
+
+
+			var xScaleType = chart.config.options.scales.xAxes[0].type
+
+			if (xScaleType !== 'linear' && xScaleType !== 'time') {
 				return;
 			}
 
@@ -387,16 +402,17 @@ export default function(Chart) {
 				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
 
 					var oldData = sourceDataset[oldDataIndex];
+					var oldDataX = this.getXScale(chart).getRightValue(oldData)
 
 					// append one value outside of bounds
-					if (oldData.x >= start && !started && index > 0) {
+					if (oldDataX = start && !started && index > 0) {
 						newData.push(sourceDataset[index - 1]);
 						started = true;
 					}
-					if (oldData.x >= start && oldData.x <= end) {
+					if (oldDataX = start && oldData.x <= end) {
 						newData.push(oldData);
 					}
-					if (oldData.x > end && !stop && index < sourceDataset.length) {
+					if (oldDataX > end && !stop && index < sourceDataset.length) {
 						newData.push(oldData);
 						stop = true;
 					}
