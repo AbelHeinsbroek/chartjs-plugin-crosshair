@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="index.css" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
 
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.1/dist/Chart.min.js"></script>
     <script src="../dist/chartjs-plugin-crosshair.js"></script>
   </head>
@@ -44,9 +43,6 @@
     <div class="split"><canvas id="chart2"></canvas></div>
     <div class="split"><canvas id="chart3"></canvas></div>
     <div class="chart"><canvas id="chart4"></canvas></div>
-    <h3>Time chart with dynamic loading of new data on zoom</h3>
-    <p>Try dragging to zoom into this endless Weierstrass function</p>
-    <div class="chart"><canvas id="chart6"></canvas></div>
     <h3>Panning Zoom</h3>
     <p>Use left and right arrows to pan!</p>
     <div class="chart"><canvas id="chart5"></canvas></div>
@@ -56,12 +52,10 @@
     function generateDataset(shift, label, color) {
       var data = [];
       var x = 0;
-
       while (x < 30) {
         data.push({ x: x, y: Math.sin(shift + x / 3) });
         x += Math.random();
       }
-
       var dataset = {
         backgroundColor: color,
         borderColor: color,
@@ -159,7 +153,7 @@
       type: "scatter",
       options: {
         tooltips: {
-          mode: "index",
+          mode: "interpolate",
           intersect: false,
           callbacks: {
             title: function(a, d) {
@@ -174,7 +168,7 @@
         }
       },
       data: {
-        datasets: [generateDataset(1, "C", "blue", true)]
+        datasets: [generateDataset(1, "C", "blue")]
       }
     });
 
@@ -229,105 +223,5 @@
     };
 
     window.addEventListener("keydown", panZoom);
-    
-    function generate(x1,x2) {
-
-      if(moment.isMoment(x1)) {
-        // translate time to x1, x2
-        x1 = -2 - moment().add(-2*86400, 'seconds').diff(x1, 'seconds') / 86400
-        x2 = 2 - moment().add(2*86400, 'seconds').diff(x2, 'seconds') / 86400
-      }
-
-      var data = [];
-      var x = x1;
-      
-      a = 0.7
-      b = 8
-
-      t = moment().add(x1*86400, 'seconds')
-      t2 = moment().add(x2*86400, 'seconds')
-
-      while (x <= x2) {
-        y = 0
-        for(var n=0;n<10;n++) {
-          y+= Math.pow(a,n)*Math.cos(Math.pow(b,n)*3.14*x)
-        }
-        data.push({x:moment().add(x*86400, 'seconds'), y:y})
-
-        x += (x2-x1)/100
-      }
-
-      return data
-    }
-    
-    var chart6 = new Chart(document.getElementById("chart6").getContext("2d"), {
-      type: "scatter",
-      options: {
-        plugins: {
-          crosshair: {
-            sync: {
-              enabled: false
-            },
-            pan: {
-              incrementer: 3 // Defaults to 5 if not included.
-            },
-            callbacks: {
-              afterZoom: function(start, end) {
-                setTimeout(function() {
-                  chart6.data.datasets[0].data = generate(start, end)
-                  chart6.update()
-                }, 1000)
-              }
-            }
-          }
-        },
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.format('dd D MMM YYYY HH:mm')
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
-            }
-          }
-        },
-        animation: {
-          duration: 0
-        },
-        scales: {
-          xAxes: [{
-            type: 'time'
-          }],
-          yAxes: [{
-            ticks: {
-              min: -3,
-              max: 4
-            }
-          }]
-        },
-
-
-        responsiveAnimationDuration: 0
-      },
-      data: {
-        datasets: [{
-          backgroundColor: 'red',
-          borderColor: 'red',
-          showLine: true,
-          fill: false,
-          label: 'function',
-          pointRadius: 0,
-          data: generate(-2,2),
-          lineTension: 0,
-          interpolate: true
-      }]
-      }
-    });
-
-
   </script>
 </html>
