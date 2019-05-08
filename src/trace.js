@@ -33,10 +33,10 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-
 			if (chart.config.options.scales.xAxes.length == 0) {
 				return
 			}
+
 
 
 			var xScaleType = chart.config.options.scales.xAxes[0].type
@@ -49,6 +49,36 @@ export default function(Chart) {
 				chart.options.plugins.crosshair = defaultOptions;
 			}
 
+      // create a new canvas element just for drawing the crosshair
+      var newCanvasId = chart.canvas.id + "-crosshair"
+      var crosshairCanvas = document.createElement('canvas')
+      crosshairCanvas.id = newCanvasId
+      chart.canvas.parentNode.insertBefore(crosshairCanvas, chart.canvas.nextSibling)
+      if(crosshairCanvas.parentNode.style.position !== 'absolute') {
+        crosshairCanvas.parentNode.style.position = 'relative'
+      }
+      crosshairCanvas.style.pointerEvents = 'none'
+      crosshairCanvas.width = chart.canvas.width
+      crosshairCanvas.height = chart.canvas.height
+      crosshairCanvas.style.zindex = 1
+      crosshairCanvas.style.position = 'absolute'
+      crosshairCanvas.style.left = '0px'
+      crosshairCanvas.style.top = '0px'
+      crosshairCanvas.style.bottom = '0px'
+      crosshairCanvas.style.right = '0px'
+
+
+      if(chart.canvas.height > parseInt(chart.canvas.style.height)) {
+        // retina support
+        crosshairCanvas.getContext('2d').scale(2,2)
+      }
+
+      chart.config.options.onResize = function(chart, newsize) {
+
+        chart.crosshair.crosshairCanvas.canvas.width = newsize.width
+        chart.crosshair.crosshairCanvas.canvas.height = newsize.height
+      }
+
 			chart.crosshair = {
 				enabled: false,
 				x: null,
@@ -58,6 +88,10 @@ export default function(Chart) {
 				dragStartX: null,
 				dragEndX: null,
 				suppressTooltips: false,
+        crosshairCanvas: {
+          ctx: crosshairCanvas.getContext('2d'),
+          canvas: crosshairCanvas
+        },
 				reset: function() {
 					this.resetZoom(chart, false, false);
 				}.bind(this)
@@ -124,14 +158,14 @@ export default function(Chart) {
 
 		handleSyncEvent: function(chart, e) {
 
-			var syncGroup = this.getOption(chart, 'sync', 'group');
-
 			// stop if the sync event was fired from this chart
 			if (e.chartId === chart.id) {
 				return;
 			}
 
 			// stop if the sync event was fired from a different group
+			var syncGroup = this.getOption(chart, 'sync', 'group');
+
 			if (e.syncGroup !== syncGroup) {
 				return;
 			}
@@ -144,6 +178,19 @@ export default function(Chart) {
 
 			// Safari fix
 			var buttons = (e.original.native.buttons === undefined ? e.original.native.which : e.original.native.buttons);
+
+			var xScale = this.getXScale(chart);
+
+
+      if(buttons == 0 && e.original.type !== 'mouseup') {
+        chart.crosshair.x = e.original.x;
+        chart.crosshair.enabled = (e.type !== 'mouseout' && (e.original.x > xScale.getPixelForValue(xScale.min) && e.original.x < xScale.getPixelForValue(xScale.max)));
+
+
+        this.afterDraw(chart)
+        return
+      }
+
 			if (e.original.type === 'mouseup') {
 				buttons = 0;
 			}
@@ -245,9 +292,12 @@ export default function(Chart) {
 
 		afterDraw: function(chart) {
 
-			if (!chart.crosshair.enabled) {
+			if (!chart.crosshair.enabled || chart.data.datasets.length == 0) {
 				return;
 			}
+
+      chart.crosshair.crosshairCanvas.ctx.clearRect(0,0,chart.crosshair.crosshairCanvas.canvas.width, chart.crosshair.crosshairCanvas.canvas.height)
+
 
 			if (chart.crosshair.dragStarted) {
 				this.drawZoombox(chart);
@@ -445,30 +495,31 @@ export default function(Chart) {
 			var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor');
 			var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor');
 
-			chart.ctx.beginPath();
-			chart.ctx.rect(chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.max), chart.crosshair.x - chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max));
-			chart.ctx.lineWidth = 1;
-			chart.ctx.strokeStyle = borderColor;
-			chart.ctx.fillStyle = fillColor;
-			chart.ctx.fill();
-			chart.ctx.fillStyle = '';
-			chart.ctx.stroke();
-			chart.ctx.closePath();
+			chart.crosshair.crosshairCanvas.ctx.beginPath();
+			chart.crosshair.crosshairCanvas.ctx.rect(chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.max), chart.crosshair.x - chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max));
+			chart.crosshair.crosshairCanvas.ctx.lineWidth = 1;
+			chart.crosshair.crosshairCanvas.ctx.strokeStyle = borderColor;
+			chart.crosshair.crosshairCanvas.ctx.fillStyle = fillColor;
+			chart.crosshair.crosshairCanvas.ctx.fill();
+			chart.crosshair.crosshairCanvas.ctx.fillStyle = '';
+			chart.crosshair.crosshairCanvas.ctx.stroke();
+			chart.crosshair.crosshairCanvas.ctx.closePath();
 		},
 
 		drawTraceLine: function(chart) {
 
 			var yScale = this.getYScale(chart);
 
+
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
 
-			chart.ctx.beginPath();
-			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
-			chart.ctx.lineWidth = lineWidth;
-			chart.ctx.strokeStyle = color;
-			chart.ctx.lineTo(chart.crosshair.x, yScale.getPixelForValue(yScale.min));
-			chart.ctx.stroke();
+			chart.crosshair.crosshairCanvas.ctx.beginPath();
+			chart.crosshair.crosshairCanvas.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
+			chart.crosshair.crosshairCanvas.ctx.lineWidth = lineWidth;
+			chart.crosshair.crosshairCanvas.ctx.strokeStyle = color;
+			chart.crosshair.crosshairCanvas.ctx.lineTo(chart.crosshair.x, yScale.getPixelForValue(yScale.min));
+			chart.crosshair.crosshairCanvas.ctx.stroke();
 
 		},
 
@@ -485,13 +536,13 @@ export default function(Chart) {
 					continue;
 				}
 
-				chart.ctx.beginPath();
-				chart.ctx.arc(chart.crosshair.x, yScale.getPixelForValue(dataset.interpolatedValue), 3, 0, 2 * Math.PI, false);
-				chart.ctx.fillStyle = 'white';
-				chart.ctx.lineWidth = 2;
-				chart.ctx.strokeStyle = dataset.borderColor;
-				chart.ctx.fill();
-				chart.ctx.stroke();
+				chart.crosshair.crosshairCanvas.ctx.beginPath();
+				chart.crosshair.crosshairCanvas.ctx.arc(chart.crosshair.x, yScale.getPixelForValue(dataset.interpolatedValue), 3, 0, 2 * Math.PI, false);
+				chart.crosshair.crosshairCanvas.ctx.fillStyle = 'white';
+				chart.crosshair.crosshairCanvas.ctx.lineWidth = 2;
+				chart.crosshair.crosshairCanvas.ctx.strokeStyle = dataset.borderColor;
+				chart.crosshair.crosshairCanvas.ctx.fill();
+				chart.crosshair.crosshairCanvas.ctx.stroke();
 
 			}
 
