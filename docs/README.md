@@ -11,9 +11,7 @@ Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or l
 
 ## Documentation
 
-- [Installation](https://chartjs-plugin-crosshair.netlify.com/installation)
-- [Options](https://chartjs-plugin-crosshair.netlify.com/options)
-- [Samples](https://chartjs-plugin-crosshair.netlify.com/samples)
+{% include "SUMMARY.md" %}
 
 ## Example
 
@@ -75,5 +73,5 @@ The following commands will then be available from the repository root:
 
 ## License
 
-`chartjs-plugin-crosshair` is available under the [MIT license](LICENSE.md).
+`chartjs-plugin-crosshair` is available under the [MIT license](https://github.com/abelheinsbroek/chartjs-plugin-crosshair/blob/master/LICENSE.md).
 
