@@ -6,12 +6,6 @@
 
     npm install chartjs-plugin-crosshair --save
 
-## Bower
-
-[![bower](https://img.shields.io/bower/v/chartjs-plugin-crosshair.svg?style=flat-square&maxAge=600)](https://libraries.io/bower/chartjs-plugin-crosshair)
-
-    bower install chartjs-plugin-crosshair --save
-
 ## CDN
 
 [![jsdelivr](https://img.shields.io/npm/v/chartjs-plugin-crosshair.svg?label=jsdelivr&style=flat-square&maxAge=600)](https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@latest/dist/) [![jsdelivr hits](https://data.jsdelivr.com/v1/package/npm/chartjs-plugin-crosshair/badge)](https://www.jsdelivr.com/package/npm/chartjs-plugin-crosshair)
