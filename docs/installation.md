@@ -19,10 +19,9 @@ Read more about jsDeliver versioning on their [website](http://www.jsdelivr.com/
 
 ## Download
 
-[![github](https://img.shields.io/github/release/chartjs/chartjs-plugin-crosshair.svg?style=flat-square&maxAge=600)](https://github.com/chartjs/chartjs-plugin-crosshair/releases/latest) [![github downloads](https://img.shields.io/github/downloads/chartjs/chartjs-plugin-crosshair/total.svg?style=flat-square&maxAge=600)](http://www.somsubhra.com/github-release-stats/?username=chartjs&repository=chartjs-plugin-crosshair)
+[![github](https://img.shields.io/github/release/abelheinsbroek/chartjs-plugin-crosshair.svg?style=flat-square&maxAge=600)](https://github.com/abelheinsbroek/chartjs-plugin-crosshair/releases/latest) [![github downloads](https://img.shields.io/github/downloads/abelheinsbroek/chartjs-plugin-crosshair/total.svg?style=flat-square&maxAge=600)](http://www.somsubhra.com/github-release-stats/?username=abelheinsbroek&repository=chartjs-plugin-crosshair)
 
-You can download the latest version of `chartjs-plugin-crosshair` from the [GitHub releases](https://github.com/chartjs/chartjs-plugin-crosshair/releases/latest):
+You can download the latest version of `chartjs-plugin-crosshair` from the [GitHub releases](https://github.com/abelheinsbroek/chartjs-plugin-crosshair/releases/latest):
 
 - `chartjs-plugin-crosshair.js` (recommended for development)
 - `chartjs-plugin-crosshair.min.js` (recommended for production)
-- `chartjs-plugin-crosshair.zip` (contains `.js` and `.min.js` versions + samples)
