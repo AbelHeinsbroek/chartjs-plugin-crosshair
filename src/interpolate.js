@@ -89,7 +89,8 @@ export default function(Chart) {
 					getLabelForIndex: function(indx) {
 						return items[indx].value;
 					}
-				}
+				},
+				_chart: chart
 			};
 
 			items.push(fakePoint);
