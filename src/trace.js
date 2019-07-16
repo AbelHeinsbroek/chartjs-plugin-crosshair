@@ -33,7 +33,6 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-
 			if (chart.config.options.scales.xAxes.length == 0) {
 				return
 			}
@@ -386,6 +385,7 @@ export default function(Chart) {
 			// make a copy of the original data for later restoration
 			var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
 			// filter dataset
+      
 			for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
 				var newData = [];
@@ -405,11 +405,11 @@ export default function(Chart) {
 					var oldDataX = this.getXScale(chart).getRightValue(oldData)
 
 					// append one value outside of bounds
-					if (oldDataX = start && !started && index > 0) {
+					if (oldDataX >= start && !started && index > 0) {
 						newData.push(sourceDataset[index - 1]);
 						started = true;
 					}
-					if (oldDataX = start && oldData.x <= end) {
+					if (oldDataX >= start && oldDataX <= end) {
 						newData.push(oldData);
 					}
 					if (oldDataX > end && !stop && index < sourceDataset.length) {
