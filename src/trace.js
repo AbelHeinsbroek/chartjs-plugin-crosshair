@@ -385,7 +385,7 @@ export default function(Chart) {
 			// make a copy of the original data for later restoration
 			var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
 			// filter dataset
-      
+
 			for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
 				var newData = [];
@@ -444,7 +444,7 @@ export default function(Chart) {
 
 			var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor');
 			var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor');
-
+			chart.ctx.setLineDash([0,0]);
 			chart.ctx.beginPath();
 			chart.ctx.rect(chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.max), chart.crosshair.x - chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = 1;
@@ -462,7 +462,7 @@ export default function(Chart) {
 
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
-
+			chart.ctx.setLineDash([4, 4]);
 			chart.ctx.beginPath();
 			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = lineWidth;

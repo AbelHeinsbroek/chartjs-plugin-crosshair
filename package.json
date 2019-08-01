@@ -1,5 +1,5 @@
 {
-  "name": "chartjs-plugin-crosshair",
+  "name": "@omgduke/chartjs-plugin-crosshair",
   "homepage": "https://chartjs-plugin-crosshair.netlify.com",
   "description": "Chart.js plugin to draw and sync vertical crosshair lines",
   "version": "1.1.4",
@@ -7,7 +7,7 @@
   "main": "dist/chartjs-plugin-crosshair.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abelheinsbroek/chartjs-plugin-crosshair.git"
+    "url": "https://github.com/OMGDuke/chartjs-plugin-crosshair.git"
   },
   "devDependencies": {
     "eslint-config-chartjs": "^0.1.0",
@@ -34,5 +34,8 @@
   },
   "dependencies": {
     "chart.js": "^2.8.0"
+  },
+  "scripts": {
+    "build": "gulp build"
   }
 }
