@@ -85,6 +85,17 @@ Text of the button to reset the chart to original axis ranges.
 #### `zoomButtonClass`
 Class of the button to reset the chart to original axis ranges.
 
+### Snapping
+The plugin allows snapping to datapoints when used with `line` charts
+> This option requires the `hover.intersect` configuration option of your chart to be set to `false`.
+
+| Name | Type | Default
+| ---- | ---- | ----
+| [`enabled`](#enabled) | `Boolean` | `false`
+
+#### `enabled`
+Enable or disable snapping to point for `line` charts
+
 ### Callbacks
 
 The plugin exposes to callbacks to handle zooming
