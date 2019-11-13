@@ -19,10 +19,23 @@ Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or l
 ## Example
 
 ```javascript
-new Chart(ctx, {
+const chart = new Chart(ctx, {
   // ... data ...
   options: {
     // ... other options ...
+    data: {
+        datasets: [
+            {
+                /// ... more data
+                crosshair: {
+                  pointBackgroundColor: color,
+                  pointBorderColor: '#2f3136',
+                  pointBorderWidth: 1,
+                  pointRadius: 5,
+                },
+            }
+        ],
+    },
     tooltips: {
       mode: 'interpolate',
       intersect: false
@@ -56,6 +69,9 @@ new Chart(ctx, {
     }
   }
 });
+
+// For zooming programmatically
+chart.crosshair.zoom(start, end);
 ```
 
 ## Development
