@@ -195,7 +195,7 @@ export default function(Chart) {
 			var syncGroup = this.getOption(chart, 'sync', 'group');
 
 			// fire event for all other linked charts
-			if (!e.stop && syncEnabled) {
+			if (!e.stop && syncEnabled && e.type !== 'click') {
 				var event = new CustomEvent('sync-event');
 				event.chartId = chart.id;
 				event.syncGroup = syncGroup;
