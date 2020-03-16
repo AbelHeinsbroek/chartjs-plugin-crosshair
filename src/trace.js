@@ -478,7 +478,6 @@ export default function(Chart) {
 			if (snapEnabled && isHoverIntersectOff && chart.active.length) {
 				lineX = chart.active[0]._view.x;
 			}
-			chart.ctx.setLineDash([4, 4]);
 
 			chart.ctx.beginPath();
 			chart.ctx.setLineDash(dashPattern);
@@ -487,7 +486,7 @@ export default function(Chart) {
 			chart.ctx.strokeStyle = color;
 			chart.ctx.lineTo(lineX, yScale.getPixelForValue(yScale.min));
 			chart.ctx.stroke();
-			chart.ctx.setLineDash([]);
+			chart.ctx.setLineDash([4, 4]);
 
 		},
 
