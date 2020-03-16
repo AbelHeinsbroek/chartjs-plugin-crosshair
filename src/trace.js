@@ -85,6 +85,9 @@ export default function(Chart) {
 		},
 
 		destroy: function(chart) {
+			if(!chart.crosshair) {
+				chart.crosshair = {syncEventHandler:  () => {} };
+			}
 			var syncEnabled = this.getOption(chart, 'sync', 'enabled');
 			if (syncEnabled) {
 				window.removeEventListener('sync-event', chart.crosshair.syncEventHandler);
