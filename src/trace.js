@@ -4,7 +4,8 @@ export default function(Chart) {
 	var defaultOptions = {
 		line: {
 			color: '#F66',
-			width: 1
+			width: 1,
+			dashPattern: []
 		},
 		sync: {
 			enabled: true,
@@ -18,11 +19,14 @@ export default function(Chart) {
 			zoomButtonText: 'Reset Zoom',
 			zoomButtonClass: 'reset-zoom',
 		},
+		snap: {
+			enabled: false,
+		},
 		callbacks: {
-			beforeZoom: function(start, end) {
+			beforeZoom: function() {
 				return true;
 			},
-			afterZoom: function(start, end) {
+			afterZoom: function() {
 			}
 		}
 	};
@@ -33,14 +37,14 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
-				return
+			if (chart.config.options.scales.xAxes.length === 0) {
+				return;
 			}
 
 
-			var xScaleType = chart.config.options.scales.xAxes[0].type
+			var xScaleType = chart.config.options.scales.xAxes[0].type;
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
 				return;
 			}
 
@@ -85,8 +89,8 @@ export default function(Chart) {
 		},
 
 		destroy: function(chart) {
-			if(!chart.crosshair) {
-				chart.crosshair = {syncEventHandler:  () => {} };
+			if (!chart.crosshair) {
+				chart.crosshair = {syncEventHandler: () => {}};
 			}
 			var syncEnabled = this.getOption(chart, 'sync', 'enabled');
 			if (syncEnabled) {
@@ -165,14 +169,14 @@ export default function(Chart) {
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
-				return
+			if (chart.config.options.scales.xAxes.length === 0) {
+				return;
 			}
 
 
-			var xScaleType = chart.config.options.scales.xAxes[0].type
+			var xScaleType = chart.config.options.scales.xAxes[0].type;
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
 				return;
 			}
 
@@ -363,8 +367,8 @@ export default function(Chart) {
 				// add restore zoom button
 				var button = document.createElement('button');
 
-				var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText')
-				var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass')
+				var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText');
+				var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass');
 
 				var buttonLabel = document.createTextNode(buttonText);
 				button.appendChild(buttonLabel);
@@ -405,7 +409,7 @@ export default function(Chart) {
 				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
 
 					var oldData = sourceDataset[oldDataIndex];
-					var oldDataX = this.getXScale(chart).getRightValue(oldData)
+					var oldDataX = this.getXScale(chart).getRightValue(oldData);
 
 					// append one value outside of bounds
 					if (oldDataX >= start && !started && index > 0) {
@@ -447,7 +451,7 @@ export default function(Chart) {
 
 			var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor');
 			var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor');
-			chart.ctx.setLineDash([0,0]);
+			chart.ctx.setLineDash([0, 0]);
 			chart.ctx.beginPath();
 			chart.ctx.rect(chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.max), chart.crosshair.x - chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = 1;
@@ -465,13 +469,25 @@ export default function(Chart) {
 
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
+			var dashPattern = this.getOption(chart, 'line', 'dashPattern');
+			var snapEnabled = this.getOption(chart, 'snap', 'enabled');
+
+			var lineX = chart.crosshair.x;
+			var isHoverIntersectOff = chart.config.options.hover.intersect === false;
+
+			if (snapEnabled && isHoverIntersectOff && chart.active.length) {
+				lineX = chart.active[0]._view.x;
+			}
 			chart.ctx.setLineDash([4, 4]);
+
 			chart.ctx.beginPath();
-			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
+			chart.ctx.setLineDash(dashPattern);
+			chart.ctx.moveTo(lineX, yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = lineWidth;
 			chart.ctx.strokeStyle = color;
-			chart.ctx.lineTo(chart.crosshair.x, yScale.getPixelForValue(yScale.min));
+			chart.ctx.lineTo(lineX, yScale.getPixelForValue(yScale.min));
 			chart.ctx.stroke();
+			chart.ctx.setLineDash([]);
 
 		},
 
