@@ -19,10 +19,10 @@ export default function(Chart) {
 			zoomButtonClass: 'reset-zoom',
 		},
 		callbacks: {
-			beforeZoom: function() {
+			beforeZoom: function(start, end) {
 				return true;
 			},
-			afterZoom: function() {
+			afterZoom: function(start, end) {
 			}
 		}
 	};
@@ -33,7 +33,7 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length === 0) {
+			if (chart.config.options.scales.xAxes.length == 0) {
 				return;
 			}
 
@@ -165,7 +165,7 @@ export default function(Chart) {
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.options.scales.xAxes.length === 0) {
+			if (chart.config.options.scales.xAxes.length == 0) {
 				return;
 			}
 
@@ -465,7 +465,7 @@ export default function(Chart) {
 
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
-
+			chart.ctx.setLineDash([4, 4]);
 			chart.ctx.beginPath();
 			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = lineWidth;
