@@ -4,8 +4,7 @@ export default function(Chart) {
 	var defaultOptions = {
 		line: {
 			color: '#F66',
-			width: 1,
-			dashPattern: []
+			width: 1
 		},
 		sync: {
 			enabled: true,
@@ -466,16 +465,13 @@ export default function(Chart) {
 
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
-			var dashPattern = this.getOption(chart, 'line', 'dashPattern');
 
 			chart.ctx.beginPath();
-			chart.ctx.setLineDash(dashPattern);
 			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = lineWidth;
 			chart.ctx.strokeStyle = color;
 			chart.ctx.lineTo(chart.crosshair.x, yScale.getPixelForValue(yScale.min));
 			chart.ctx.stroke();
-			chart.ctx.setLineDash([]);
 
 		},
 

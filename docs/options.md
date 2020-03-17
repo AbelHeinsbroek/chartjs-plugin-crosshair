@@ -31,15 +31,12 @@ options: {
 | ---- | ---- | ----
 | [`color`](#color) | `String` | `#F66`
 | [`width`](#width) | `Number` | `1`
-| [`dashPattern`](#dash) | `Number[]` | `[]`
 
 
 #### `color`
 The color of the crosshair line, defaults to red (#F666)
 #### `width`
 The width of the crosshair line in pixels
-#### `dashPattern`
-Dash pattern of the crosshair line, specified as an array of values indicating alternating lengths of lines and gaps ([More info](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash))
 
 ### Chart interaction syncing
 The plugin allows for syncing crosshairs over multiple charts

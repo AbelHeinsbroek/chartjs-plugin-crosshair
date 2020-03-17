@@ -27,9 +27,8 @@ new Chart(ctx, {
     plugins: {
       crosshair: {
         line: {
-          color: '#F66',        // crosshair line color
-          width: 1,             // crosshair line width
-          dashPattern: [5, 5]   // crosshair line dash pattern
+          color: '#F66',  // crosshair line color
+          width: 1        // crosshair line width
         },
         sync: {
           enabled: true,            // enable trace line syncing with other charts
