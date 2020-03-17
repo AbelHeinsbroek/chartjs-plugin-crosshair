@@ -33,7 +33,7 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			if (chart.config.options.scales.xAxes.length === 0) {
 				return;
 			}
 
@@ -165,7 +165,7 @@ export default function(Chart) {
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			if (chart.config.options.scales.xAxes.length === 0) {
 				return;
 			}
 
