@@ -19,9 +19,6 @@ export default function(Chart) {
 			zoomButtonText: 'Reset Zoom',
 			zoomButtonClass: 'reset-zoom',
 		},
-		snap: {
-			enabled: false,
-		},
 		callbacks: {
 			beforeZoom: function() {
 				return true;
@@ -44,7 +41,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales.xAxes[0].type;
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time') {
 				return;
 			}
 
@@ -176,7 +173,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales.xAxes[0].type;
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time') {
 				return;
 			}
 
@@ -470,22 +467,13 @@ export default function(Chart) {
 			var lineWidth = this.getOption(chart, 'line', 'width');
 			var color = this.getOption(chart, 'line', 'color');
 			var dashPattern = this.getOption(chart, 'line', 'dashPattern');
-			var snapEnabled = this.getOption(chart, 'snap', 'enabled');
-
-			var lineX = chart.crosshair.x;
-			var isHoverIntersectOff = chart.config.options.hover.intersect === false;
-
-			if (snapEnabled && isHoverIntersectOff && chart.active.length) {
-				lineX = chart.active[0]._view.x;
-			}
-			chart.ctx.setLineDash([4, 4]);
 
 			chart.ctx.beginPath();
 			chart.ctx.setLineDash(dashPattern);
-			chart.ctx.moveTo(lineX, yScale.getPixelForValue(yScale.max));
+			chart.ctx.moveTo(chart.crosshair.x, yScale.getPixelForValue(yScale.max));
 			chart.ctx.lineWidth = lineWidth;
 			chart.ctx.strokeStyle = color;
-			chart.ctx.lineTo(lineX, yScale.getPixelForValue(yScale.min));
+			chart.ctx.lineTo(chart.crosshair.x, yScale.getPixelForValue(yScale.min));
 			chart.ctx.stroke();
 			chart.ctx.setLineDash([]);
 
