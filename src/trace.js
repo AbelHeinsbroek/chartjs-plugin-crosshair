@@ -44,7 +44,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales.xAxes[0].type
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
 				return;
 			}
 
@@ -173,7 +173,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales.xAxes[0].type
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
 				return;
 			}
 
