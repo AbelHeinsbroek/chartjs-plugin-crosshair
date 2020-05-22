@@ -6,7 +6,6 @@ var file = require('gulp-file');
 var replace = require('gulp-replace');
 var streamify = require('gulp-streamify');
 var zip = require('gulp-zip');
-var karma = require('karma');
 var merge = require('merge2');
 var path = require('path');
 var {exec} = require('child_process');
@@ -40,28 +39,6 @@ gulp.task('build', function() {
 	return run('rollup', ['-c', argv.watch ? '--watch' : '']);
 });
 
-gulp.task('test-unit', function(done) {
-	new karma.Server({
-		configFile: path.join(__dirname, 'karma.config.js'),
-		singleRun: !argv.watch,
-		args: {
-			coverage: !!argv.coverage,
-			inputs: (argv.inputs || 'test/specs/**/*.js').split(';'),
-			watch: argv.watch
-		}
-	},
-	function(error) {
-		// https://github.com/karma-runner/gulp-karma/issues/18
-		error = error ? new Error('Karma returned with the error code: ' + error) : undefined;
-		done(error);
-	}).start();
-});
-
-gulp.task('test-types', function() {
-	return run('tsc', ['-p', 'types/test/']);
-});
-
-gulp.task('test', gulp.parallel('test-unit', 'test-types'));
 
 gulp.task('lint', function() {
 	var files = [
