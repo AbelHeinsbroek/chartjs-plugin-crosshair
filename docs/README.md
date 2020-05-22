@@ -1,6 +1,6 @@
 <div align="center">
     <centering>
-    <img src="header.png" width='600px'/>
+    <img src="./header.png" width='600px'/>
     </centering>
 </div>
 
@@ -11,7 +11,9 @@ Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or l
 
 ## Documentation
 
-{% include "SUMMARY.md" %}
+* [Installation](installation.md)
+* [Options](options.md)
+* [Samples](https://chartjs-plugin-crosshair.netlify.com/samples)
 
 ## Example
 
