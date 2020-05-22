@@ -15,7 +15,6 @@
     "crosshair"
   ],
   "files": [
-    "bower.json",
     "dist/chartjs-plugin-crosshair.min.js"
   ],
   "devDependencies": {
