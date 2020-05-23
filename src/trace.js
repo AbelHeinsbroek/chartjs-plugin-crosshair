@@ -61,9 +61,12 @@ export default function(Chart) {
 				dragStartX: null,
 				dragEndX: null,
 				suppressTooltips: false,
-				reset: function() {
-					this.resetZoom(chart, false, false);
-				}.bind(this)
+                reset: function() {
+                    this.resetZoom(chart, false, false);
+                }.bind(this),
+                zoom: function(start, end) {
+                    this.doZoom(chart, start, end);
+                }.bind(this)
 			};
 
 			var syncEnabled = this.getOption(chart, 'sync', 'enabled');
@@ -496,15 +499,15 @@ export default function(Chart) {
 
 				var yScale = chart.scales[meta.yAxisID];
 
-				if (meta.hidden || !dataset.interpolate) {
+                if (meta.hidden || !dataset.interpolate) {
 					continue;
 				}
 
 				chart.ctx.beginPath();
-				chart.ctx.arc(chart.crosshair.x, yScale.getPixelForValue(dataset.interpolatedValue), 3, 0, 2 * Math.PI, false);
-				chart.ctx.fillStyle = 'white';
-				chart.ctx.lineWidth = 2;
-				chart.ctx.strokeStyle = dataset.borderColor;
+				chart.ctx.arc(chart.crosshair.x, yScale.getPixelForValue(dataset.interpolatedValue), (dataset.crosshair || {}).pointRadius || 3, 0, 2 * Math.PI, false);
+				chart.ctx.fillStyle = (dataset.crosshair || {}).pointBackgroundColor || 'white';
+				chart.ctx.lineWidth = (dataset.crosshair || {}).pointBorderWidth || 2;
+				chart.ctx.strokeStyle = (dataset.crosshair || {}).pointBorderColor || dataset.borderColor;
 				chart.ctx.fill();
 				chart.ctx.stroke();
 
