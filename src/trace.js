@@ -415,6 +415,12 @@ export default function(Chart) {
 					}
 					if (oldDataX >= start && oldDataX <= end) {
 						newData.push(oldData);
+						if (index === 0) {
+							// If the first possible value is included in the zoom bounds,
+							// we can consider the zoom data started.
+							// There is no other value we could possible add before the zoom bounds.
+							started = true;
+						}
 					}
 					if (oldDataX > end && !stop && index < sourceDataset.length) {
 						newData.push(oldData);
