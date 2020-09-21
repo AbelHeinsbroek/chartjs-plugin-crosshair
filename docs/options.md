@@ -105,3 +105,5 @@ Called before zooming, return false to prevent the zoom
 #### `afterZoom(start,end)`
 Called after zooming, can for example be used for reloading data at a higher
 resolution
+#### `afterZoomReset()`
+Called after zoom is reset

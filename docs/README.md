@@ -50,7 +50,9 @@ new Chart(ctx, {
             return true;
           },
           afterZoom: function(start, end) {                   // called after zoom
-          }
+          },
+          afterZoomReset: function() {                        // called after zoom reset
+          },
         }
       }
     }

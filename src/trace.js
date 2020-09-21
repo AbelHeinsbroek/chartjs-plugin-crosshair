@@ -27,6 +27,8 @@ export default function(Chart) {
 				return true;
 			},
 			afterZoom: function(start, end) {
+			},
+			afterZoomReset: function() {
 			}
 		}
 	};
@@ -321,6 +323,9 @@ export default function(Chart) {
 				chart.update();
 				chart.options.animation = anim;
 			}
+
+			var afterZoomResetCallback = this.getOption(chart, 'callbacks', 'afterZoomReset');
+			afterZoomResetCallback();
 		},
 
 		doZoom: function(chart, start, end) {
