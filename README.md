@@ -36,7 +36,8 @@ new Chart(ctx, {
         sync: {
           enabled: true,            // enable trace line syncing with other charts
           group: 1,                 // chart group
-          suppressTooltips: false   // suppress tooltips when showing a synced tracer
+          suppressTooltips: false,  // suppress tooltips when showing a synced tracer
+          suppressClicks: false,    // suppress clicks on synced chart (ex: to disable legend sync)
         },
         zoom: {
           enabled: true,                                      // enable zooming

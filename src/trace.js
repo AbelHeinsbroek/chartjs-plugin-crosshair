@@ -10,7 +10,8 @@ export default function(Chart) {
 		sync: {
 			enabled: true,
 			group: 1,
-			suppressTooltips: false
+			suppressTooltips: false,
+			suppressClicks: false,
 		},
 		zoom: {
 			enabled: true,
@@ -136,6 +137,12 @@ export default function(Chart) {
 
 			// stop if the sync event was fired from a different group
 			if (e.syncGroup !== syncGroup) {
+				return;
+			}
+
+			// stop clicks (ex: to disable legend sync)
+			var suppressClicks = this.getOption(chart, 'sync', 'suppressClicks');
+			if (suppressClicks && e.original.type === 'click') {
 				return;
 			}
 

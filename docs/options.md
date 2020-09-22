@@ -48,7 +48,8 @@ The plugin allows for syncing crosshairs over multiple charts
 | ---- | ---- | ----
 | [`enabled`](#enabled) | `Boolean` | `true`
 | [`group`](#group) | `Number` | `1`
-| [`suppressTooltips`](#tooltips) | `Boolean` | `false`
+| [`suppressTooltips`](#suppressTooltips) | `Boolean` | `false`
+| [`suppressClicks`](#suppressClicks) | `Boolean` | `false`
 
 
 #### `enabled`
@@ -57,6 +58,9 @@ Enable or disable syncing of crosshairs between charts of the same group
 Limit crosshair syncing to charts belonging to the same 'group'
 #### `suppressTooltips`
 Allows for suppressing tooltips when showing a synced crosshair
+#### `suppressClicks`
+Allows for suppressing clicks when showing a synced crosshair.  
+Useful for disabling legend sync.
 
 ### Zooming
 The plugin allows for horizontal zooming by clicking and dragging over
