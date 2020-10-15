@@ -5,12 +5,13 @@ export default function(Chart) {
 		line: {
 			color: '#F66',
 			width: 1,
-			dashPattern: []
+			dashPattern: [],
+			drawUnderChart: false,
 		},
 		sync: {
 			enabled: true,
 			group: 1,
-			suppressTooltips: false
+			suppressTooltips: false,
 		},
 		zoom: {
 			enabled: true,
@@ -27,8 +28,8 @@ export default function(Chart) {
 				return true;
 			},
 			afterZoom: function(start, end) {
-			}
-		}
+			},
+		},
 	};
 
 	var crosshairPlugin = {
@@ -246,21 +247,35 @@ export default function(Chart) {
 
 		},
 
-		afterDraw: function(chart) {
+		doDraw: function( chart ) {
 
-			if (!chart.crosshair.enabled) {
-				return;
-			}
-
-			if (chart.crosshair.dragStarted) {
-				this.drawZoombox(chart);
+			if ( chart.crosshair.dragStarted ) {
+				this.drawZoombox( chart );
 			} else {
-				this.drawTraceLine(chart);
-				this.interpolateValues(chart);
-				this.drawTracePoints(chart);
+				this.drawTraceLine( chart );
+				this.interpolateValues( chart );
+				this.drawTracePoints( chart );
 			}
 
 			return true;
+		},
+
+		beforeDraw: function( chart ) {
+
+			if ( ! chart.crosshair.enabled || ! this.getOption( chart, "line", "drawUnderChart" ) ) {
+				return;
+			}
+
+			return this.doDraw( chart );
+		},
+
+		afterDraw: function( chart ) {
+
+			if ( ! chart.crosshair.enabled || this.getOption( chart, "line", "drawUnderChart" ) ) {
+				return;
+			}
+
+			return this.doDraw( chart );
 		},
 
 		beforeTooltipDraw: function(chart) {

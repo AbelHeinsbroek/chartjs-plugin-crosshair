@@ -32,6 +32,8 @@ new Chart(ctx, {
         line: {
           color: '#F66',  // crosshair line color
           width: 1        // crosshair line width
+          dashPattern: [],
+          drawUnderChart: false, // draw the crosshair under everything else
         },
         sync: {
           enabled: true,            // enable trace line syncing with other charts
