@@ -45,6 +45,8 @@ export default function(Chart) {
     receive: function(chart, e) {
 
       var xScale = this.getXScale(chart)
+      if (xScale === null) { return }
+
 
       var newEvent = {
         type: e.type,
