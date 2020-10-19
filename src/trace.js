@@ -104,7 +104,11 @@ export default function(Chart) {
 				var end = xScale.getValueForPixel(chart.crosshair.x);
 
 				if (Math.abs(chart.crosshair.dragStartX - chart.crosshair.x) > 1) {
-					this.doZoom(chart, start, end);
+					this.doHorizontalZoom(chart, start, end);
+					// fire new event to force redrawing of tooltip and tracepoints
+					var newEvent = {type: 'mouseover', chart: chart, x: e.x, y: e.y, target: e.native.target, native: e.native}
+					chart.controller.eventHandler(newEvent)
+					return true // prevent double update
 				}
 			}
 
@@ -115,7 +119,7 @@ export default function(Chart) {
 
 			return true
 		},
-		doZoom: function(chart, start, end) {
+		doHorizontalZoom: function(chart, start, end) {
 
 			// swap start/end if user dragged from right to left
 			if (start > end) {
