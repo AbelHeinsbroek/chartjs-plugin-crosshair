@@ -24,6 +24,9 @@ export default function(Chart) {
       // update tooltip
       if (Chart.plugins.notify(chart, 'beforeTooltipDraw')) {
         this.updateTooltip(chart, e)
+      } else {
+        // hide tooltip
+        chart.fasttooltip.tooltipDiv.style.display = 'none'
       }
     },
     afterDatasetsUpdate: function(chart) {

@@ -36,7 +36,6 @@ export default function(Chart) {
 				continue;
 			}
 
-
 			// linear interpolate value
 			var prev = data[index - 1];
 			var next = data[index];
