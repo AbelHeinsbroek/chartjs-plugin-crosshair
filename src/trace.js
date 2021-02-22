@@ -212,7 +212,7 @@ export default function(Chart) {
 
 			chart.crosshair.suppressTooltips = e.stop && suppressTooltips;
 
-			chart.crosshair.enabled = (this.getOption(chart, 'line', 'deactivateEvents').every(eventType => !e.type === eventType) && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)));
+			chart.crosshair.enabled = (this.getOption(chart, 'line', 'deactivateEvents').every(eventType => e.type !== eventType) && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)));
 
 			if (!chart.crosshair.enabled) {
 				if (e.x > xScale.getPixelForValue(xScale.max)) {
