@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>chartjs-plugin-trace / sample</title>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="../dist/chartjs-plugin-crosshair.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      <div class="title">
+        <span class="main">chartjs-plugin-crosshair</span>
+        <span class="name">Sample</span>
+      </div>
+      <div class="caption">
+        <a href="http://www.chartjs.org">Chart.js</a>
+        plugin to draw crosshair lines, interpolate values and zoom
+      </div>
+      <div class="links">
+        <a
+          class="btn btn-docs"
+          href="https://chartjs-plugin-crosshair.netlify.com"
+        >
+          Documentation
+        </a>
+        <a
+          class="btn btn-gh"
+          href="https://github.com/abelheinsbroek/chartjs-plugin-crosshair"
+        >
+          GitHub
+        </a>
+      </div>
+    </div>
+    <h3>Snap Example</h3>
+    <div class="chart"><canvas id="chart1"></canvas></div>
+  </body>
+
+  <script>
+    function generateDataset(label, color) {
+      const data = Array.from({length: 12}, () => Math.floor(Math.random() * 12));
+      
+      return {
+        backgroundColor: color,
+        borderColor: color,
+        showLine: true,
+        fill: false,
+        pointRadius: 2,
+        label,
+        data,
+      };
+    }
+
+    var chart1 = new Chart(document.getElementById("chart1").getContext("2d"), {
+      type: "line",
+      options: {
+        plugins: {
+          crosshair: {
+            sync: {
+              enabled: false
+            },
+            zoom: {
+              enabled: false
+            },
+            snap: {
+              enabled: true
+            }
+          }
+        },
+
+        hover: {
+          intersect: false
+        },
+
+        tooltips: {
+          mode: "index",
+          intersect: false,
+        },
+
+      },
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [
+          generateDataset("A", "red"),
+          generateDataset("B", "green"),
+          generateDataset("C", "blue")
+        ]
+      }
+    });
+  </script>
+</html>

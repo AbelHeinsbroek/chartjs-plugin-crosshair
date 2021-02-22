@@ -1,24 +1,50 @@
+const terser = require('rollup-plugin-terser').terser;
 const pkg = require('./package.json');
 
-const banner = `/*
- * @license
- * ` + pkg.name + `
- * http://abelheinsbroek.nl/
- * Version: ` + pkg.version + `
- *
- * Copyright ` + (new Date().getFullYear()) + ` Abel Heinsbroek
- * Released under the MIT license
- * https://github.com/abelheinsbroek/` + pkg.name + `/blob/master/LICENSE.md
+const banner = `/*!
+ * ${pkg.name} v${pkg.version}
+ * ${pkg.homepage}
+ * (c) ${new Date().getFullYear()} Chart.js Contributors
+ * Released under the ${pkg.license} license
  */`;
 
-export default {
-	input: 'src/index.js',
-	banner: banner,
-	format: 'umd',
-	external: [
-		'chart.js'
-	],
-	globals: {
-		'chart.js': 'Chart'
+module.exports = [
+	{
+		input: 'src/index.js',
+		output: {
+			name: 'ChartCrosshair',
+			file: `dist/${pkg.name}.js`,
+			banner: banner,
+			format: 'umd',
+			indent: false,
+			globals: {
+				'chart.js': 'Chart',
+			}
+		},
+		external: [
+			'chart.js',
+		]
+	},
+	{
+		input: 'src/index.js',
+		output: {
+			name: 'ChartCrosshair',
+			file: `dist/${pkg.name}.min.js`,
+			format: 'umd',
+			indent: false,
+			globals: {
+				'chart.js': 'Chart',
+			}
+		},
+		plugins: [
+			terser({
+				output: {
+					preamble: banner
+				}
+			})
+		],
+		external: [
+			'chart.js',
+		]
 	}
-};
+];
