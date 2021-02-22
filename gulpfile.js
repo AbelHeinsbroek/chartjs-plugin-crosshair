@@ -1,19 +1,14 @@
-'use strict';
+/* global Promise */
 
 var gulp = require('gulp');
 var eslint = require('gulp-eslint');
 var file = require('gulp-file');
-var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var streamify = require('gulp-streamify');
-var uglify = require('gulp-uglify');
-var gutil = require('gulp-util');
 var zip = require('gulp-zip');
 var merge = require('merge2');
 var path = require('path');
-var rollup = require('rollup-stream');
-var source = require('vinyl-source-stream');
-var {exec} = require('mz/child_process');
+var {exec} = require('child_process');
 var pkg = require('./package.json');
 
 var argv = require('yargs')
@@ -23,41 +18,34 @@ var argv = require('yargs')
 	.option('www-dir', {default: 'www'})
 	.argv;
 
-function watch(glob, task) {
-	gutil.log('Waiting for changes...');
-	return gulp.watch(glob, function(e) {
-		gutil.log('Changes detected for', path.relative('.', e.path), '(' + e.type + ')');
-		var r = task();
-		gutil.log('Waiting for changes...');
-		return r;
+function run(bin, args) {
+	return new Promise((resolve, reject) => {
+		var exe = path.join('node_modules', '.bin', bin);
+		var ps = exec([exe].concat(args || []).join(' '));
+
+		ps.stdout.pipe(process.stdout);
+		ps.stderr.pipe(process.stderr);
+		ps.on('close', (error) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve();
+			}
+		});
 	});
 }
 
-gulp.task('default', ['build']);
-
 gulp.task('build', function() {
-	var out = argv.output;
-	var task = function() {
-		return rollup('rollup.config.js')
-			.pipe(source(pkg.name + '.js'))
-			.pipe(gulp.dest(out))
-			.pipe(rename(pkg.name + '.min.js'))
-			.pipe(streamify(uglify({output: {comments: 'some'}})))
-			.pipe(gulp.dest(out));
-	};
-
-	var tasks = [task()];
-	if (argv.watch) {
-		tasks.push(watch('src/**/*.js', task));
-	}
-
-	return tasks;
+	return run('rollup', ['-c', argv.watch ? '--watch' : '']);
 });
+
 
 gulp.task('lint', function() {
 	var files = [
 		'samples/**/*.js',
+		'samples/**/*.html',
 		'src/**/*.js',
+		'test/**/*.js',
 		'*.js'
 	];
 
@@ -67,30 +55,23 @@ gulp.task('lint', function() {
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('docs', function(done) {
-	var script = require.resolve('gitbook-cli/bin/gitbook.js');
+gulp.task('docs', function() {
+	var mode = argv.watch ? 'dev' : 'build';
 	var out = path.join(argv.output, argv.docsDir);
-	var cmd = process.execPath;
-
-	exec([cmd, script, 'install', './'].join(' ')).then(() => {
-		return exec([cmd, script, 'build', './', out].join(' '));
-	}).then(() => {
-		done();
-	}).catch((err) => {
-		done(new Error(err.stdout || err));
-	});
+	var args = argv.watch ? '' : '--dest ' + out;
+	return run('vuepress', [mode, 'docs', args]);
 });
 
 gulp.task('samples', function() {
 	// since we moved the dist files one folder up (package root), we need to rewrite
 	// samples src="../dist/ to src="../ and then copy them in the /samples directory.
 	var out = path.join(argv.output, argv.samplesDir);
-	return gulp.src('samples/*', {})
+	return gulp.src('samples/**/*', {base: 'samples'})
 		.pipe(streamify(replace(/src="((?:\.\.\/)+)dist\//g, 'src="$1', {skipBinary: true})))
 		.pipe(gulp.dest(out));
 });
 
-gulp.task('package', ['build', 'samples'], function() {
+gulp.task('package', gulp.series(gulp.parallel('build', 'samples'), function() {
 	var out = argv.output;
 	var streams = merge(
 		gulp.src(path.join(out, argv.samplesDir, '**/*'), {base: out}),
@@ -100,9 +81,9 @@ gulp.task('package', ['build', 'samples'], function() {
 	return streams
 		.pipe(zip(pkg.name + '.zip'))
 		.pipe(gulp.dest(out));
-});
+}));
 
-gulp.task('netlify', ['build', 'docs', 'samples'], function() {
+gulp.task('netlify', gulp.series(gulp.parallel('build', 'docs', 'samples'), function() {
 	var root = argv.output;
 	var out = path.join(root, argv.wwwDir);
 	var streams = merge(
@@ -111,10 +92,8 @@ gulp.task('netlify', ['build', 'docs', 'samples'], function() {
 		gulp.src(path.join(root, '*.js'))
 	);
 
-	return streams
-		.pipe(streamify(replace(/https?:\/\/chartjs-plugin-crosshair\.netlify\.com\/?/g, '/', {skipBinary: true})))
-		.pipe(gulp.dest(out));
-});
+	return streams.pipe(gulp.dest(out));
+}));
 
 gulp.task('bower', function() {
 	var json = JSON.stringify({
@@ -123,9 +102,11 @@ gulp.task('bower', function() {
 		homepage: pkg.homepage,
 		license: pkg.license,
 		version: pkg.version,
-		main: argv.output + pkg.name + '.js'
+		main: argv.output + '/' + pkg.name + '.js'
 	}, null, 2);
 
 	return file('bower.json', json, {src: true})
 		.pipe(gulp.dest('./'));
 });
+
+gulp.task('default', gulp.parallel('build'));
