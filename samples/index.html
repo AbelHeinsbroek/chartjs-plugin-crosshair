@@ -9,7 +9,7 @@
     <link rel="icon" type="image/ico" href="favicon.ico" />
 
     <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0-beta.11/dist/chart.min.js"></script>
     <script src="../dist/chartjs-plugin-crosshair.js"></script>
   </head>
   <body>
@@ -272,9 +272,10 @@
               incrementer: 3 // Defaults to 5 if not included.
             },
             callbacks: {
-              afterZoom: function(start, end) {
+              afterZoom: function(start, end) { 
                 setTimeout(function() {
-                  chart6.data.datasets[0].data = generate(start, end)
+                  const data = generate(start, end)
+                  chart6.config.data.datasets[0].data = data
                   chart6.update()
                 }, 1000)
               }
@@ -309,8 +310,6 @@
             }
           }]
         },
-
-
         responsiveAnimationDuration: 0
       },
       data: {
@@ -327,7 +326,5 @@
       }]
       }
     });
-
-
   </script>
 </html>

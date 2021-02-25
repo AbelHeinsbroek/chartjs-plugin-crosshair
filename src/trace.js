@@ -37,12 +37,15 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			let xAxes = Object.keys(chart.config.options.scales).filter(function(key){
+				return chart.config.options.scales[key].axis === 'x';
+			})
+
+			if (xAxes.length === 0) {
 				return
 			}
 
-
-			var xScaleType = chart.config.options.scales.xAxes[0].type
+			var xScaleType = chart.config.options.scales[xAxes[0]].type
 
 			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
 				return;
@@ -115,9 +118,8 @@ export default function(Chart) {
 		},
 
 		getOption: function(chart, category, name) {
-			return helpers.getValueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
+			return helpers.valueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
 		},
-
 		getXScale: function(chart) {
 			return chart.data.datasets.length ? chart.scales[chart.getDatasetMeta(0).xAxisID] : null;
 		},
@@ -146,32 +148,36 @@ export default function(Chart) {
 			}
 
 			// Safari fix
-			var buttons = (e.original.native.buttons === undefined ? e.original.native.which : e.original.native.buttons);
+			var buttons = (e.original.event.native.buttons === undefined ? e.original.event.native.which : e.original.event.native.buttons);
 			if (e.original.type === 'mouseup') {
 				buttons = 0;
 			}
 
 			var newEvent = {
-				type: e.original.type,
+				type: e.original.event.type,
 				chart: chart,
 				x: xScale.getPixelForValue(e.xValue),
-				y: e.original.y,
+				y: e.original.event.y,
 				native: {
 					buttons: buttons
 				},
-				stop: true
+				stop: true,
 			};
-			chart.controller.eventHandler(newEvent);
+
+			chart._eventHandler(newEvent);
 		},
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			let xAxes = Object.keys(chart.config.options.scales).filter(function(key){
+				return chart.config.options.scales[key].axis === 'x';
+			})
+
+			if (xAxes.length === 0) {
 				return
 			}
 
-
-			var xScaleType = chart.config.options.scales.xAxes[0].type
+			var xScaleType = chart.config.options.scales[xAxes[0]].type
 
 			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
 				return;
@@ -179,15 +185,13 @@ export default function(Chart) {
 
 			var xScale = this.getXScale(chart);
 
-
 			if (!xScale) {
 				return;
 			}
 
-
 			// fix for Safari
-			var buttons = (e.native.buttons === undefined ? e.native.which : e.native.buttons);
-			if (e.native.type === 'mouseup') {
+			var buttons = (e.event.native.buttons === undefined ? e.event.native.which : e.event.native.buttons);
+			if (e.event.native.type === 'mouseup') {
 				buttons = 0;
 			}
 
@@ -195,39 +199,45 @@ export default function(Chart) {
 			var syncGroup = this.getOption(chart, 'sync', 'group');
 
 			// fire event for all other linked charts
-			if (!e.stop && syncEnabled) {
+			if (!e.event.stop && syncEnabled) {
 				var event = new CustomEvent('sync-event');
 				event.chartId = chart.id;
 				event.syncGroup = syncGroup;
 				event.original = e;
-				event.xValue = xScale.getValueForPixel(e.x);
+				event.xValue = xScale.getValueForPixel(e.event.x);
 				window.dispatchEvent(event);
 			}
 
 			// suppress tooltips for linked charts
 			var suppressTooltips = this.getOption(chart, 'sync', 'suppressTooltips');
 
-			chart.crosshair.suppressTooltips = e.stop && suppressTooltips;
+			chart.crosshair.suppressTooltips = e.event.stop && suppressTooltips;
 
-			chart.crosshair.enabled = (e.type !== 'mouseout' && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)));
+			chart.crosshair.enabled = (e.event.type !== 'mouseout' && (e.event.x > xScale.getPixelForValue(xScale.min) && e.event.x < xScale.getPixelForValue(xScale.max)));
 
 			if (!chart.crosshair.enabled) {
-				if (e.x > xScale.getPixelForValue(xScale.max)) {
+
+				// TODO: This makes the lib to enter in loop, is there a reason for this?
+
+				/*if (e.event.x > xScale.getPixelForValue(xScale.max)) {
 					chart.update();
-				}
+				}*/
+
 				return true;
 			}
 
 			// handle drag to zoom
 			var zoomEnabled = this.getOption(chart, 'zoom', 'enabled');
 
+
 			if (buttons === 1 && !chart.crosshair.dragStarted && zoomEnabled) {
-				chart.crosshair.dragStartX = e.x;
+				chart.crosshair.dragStartX = e.event.x;
 				chart.crosshair.dragStarted = true;
 			}
 
 			// handle drag to zoom
 			if (chart.crosshair.dragStarted && buttons === 0) {
+
 				chart.crosshair.dragStarted = false;
 
 				var start = xScale.getValueForPixel(chart.crosshair.dragStartX);
@@ -236,11 +246,11 @@ export default function(Chart) {
 				if (Math.abs(chart.crosshair.dragStartX - chart.crosshair.x) > 1) {
 					this.doZoom(chart, start, end);
 				}
+
 				chart.update();
 			}
 
-			chart.crosshair.x = e.x;
-
+			chart.crosshair.x = e.event.x;
 
 			chart.draw();
 
@@ -270,6 +280,16 @@ export default function(Chart) {
 
 		resetZoom: function(chart) {
 
+			let xAxes = Object.keys(chart.config.options.scales).filter(function(key){
+				return chart.config.options.scales[key].axis === 'x';
+			})
+
+			if (xAxes.length === 0) {
+				return
+			}
+
+			var xScale = chart.config.options.scales[xAxes[0]]
+
 			var stop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 			var update = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
@@ -281,21 +301,21 @@ export default function(Chart) {
 
 				var range = 'ticks';
 
-				if (chart.options.scales.xAxes[0].time) {
+				if (xScale.time) {
 					range = 'time';
 				}
 				// reset original xRange
 				if (chart.crosshair.originalXRange.min) {
-					chart.options.scales.xAxes[0][range].min = chart.crosshair.originalXRange.min;
+					xScale[range].min = chart.crosshair.originalXRange.min;
 					chart.crosshair.originalXRange.min = null;
 				} else {
-					delete chart.options.scales.xAxes[0][range].min;
+					delete xScale[range].min;
 				}
 				if (chart.crosshair.originalXRange.max) {
-					chart.options.scales.xAxes[0][range].max = chart.crosshair.originalXRange.max;
+					xScale[range].max = chart.crosshair.originalXRange.max;
 					chart.crosshair.originalXRange.max = null;
 				} else {
-					delete chart.options.scales.xAxes[0][range].max;
+					delete xScale[range].max;
 				}
 			}
 
@@ -333,28 +353,38 @@ export default function(Chart) {
 			}
 
 			// notify delegate
-			var beforeZoomCallback = helpers.getValueOrDefault(chart.options.plugins.crosshair.callbacks ? chart.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
+			var beforeZoomCallback = this.getOption(chart, 'callbacks', 'beforeZoom');
 
-			if (!beforeZoomCallback(start, end)) {
+			if (typeof beforeZoomCallback === 'function' && !beforeZoomCallback(start, end)) {
 				return false;
 			}
 
-			if (chart.options.scales.xAxes[0].type === 'time') {
+			let xAxesIndexes = Object.keys(chart.config.options.scales).filter(function(key){
+				return chart.config.options.scales[key].axis === 'x';
+			})
 
-				if (chart.options.scales.xAxes[0].time.min && chart.crosshair.originalData.length === 0) {
-					chart.crosshair.originalXRange.min = chart.options.scales.xAxes[0].time.min;
+			if (xAxesIndexes.length === 0) {
+				return
+			}
+
+			var xScale = chart.config.options.scales[xAxesIndexes[0]]
+
+			if (xScale.type === 'time') {
+
+				if (xScale.time.min && chart.crosshair.originalData.length === 0) {
+					chart.crosshair.originalXRange.min = xScale.time.min;
 				}
-				if (chart.options.scales.xAxes[0].time.max && chart.crosshair.originalData.length === 0) {
-					chart.crosshair.originalXRange.max = chart.options.scales.xAxes[0].time.max;
+				if (xScale.time.max && chart.crosshair.originalData.length === 0) {
+					chart.crosshair.originalXRange.max = xScale.time.max;
 				}
 
 			} else {
 
-				if (chart.options.scales.xAxes[0].ticks.min && chart.crosshair.originalData.length === undefined) {
-					chart.crosshair.originalXRange.min = chart.options.scales.xAxes[0].ticks.min;
+				if (xScale.ticks.min && chart.crosshair.originalData.length === undefined) {
+					chart.crosshair.originalXRange.min = xScale.ticks.min;
 				}
-				if (chart.options.scales.xAxes[0].ticks.max && chart.crosshair.originalData.length === undefined) {
-					chart.crosshair.originalXRange.max = chart.options.scales.xAxes[0].ticks.max;
+				if (xScale.ticks.max && chart.crosshair.originalData.length === undefined) {
+					chart.crosshair.originalXRange.max = xScale.ticks.max;
 				}
 
 
@@ -378,12 +408,12 @@ export default function(Chart) {
 			}
 
 			// set axis scale
-			if (chart.options.scales.xAxes[0].time) {
-				chart.options.scales.xAxes[0].time.min = start;
-				chart.options.scales.xAxes[0].time.max = end;
+			if (xScale.time) {
+				xScale.time.min = start;
+				xScale.time.max = end;
 			} else {
-				chart.options.scales.xAxes[0].ticks.min = start;
-				chart.options.scales.xAxes[0].ticks.max = end;
+				xScale.ticks.min = start;
+				xScale.ticks.max = end;
 			}
 
 			// make a copy of the original data for later restoration
@@ -406,7 +436,8 @@ export default function(Chart) {
 				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
 
 					var oldData = sourceDataset[oldDataIndex];
-					var oldDataX = this.getXScale(chart).getRightValue(oldData)
+
+					var oldDataX = this.getRightValue(oldData, chart)
 
 					// append one value outside of bounds
 					if (oldDataX >= start && !started && index > 0) {
@@ -437,9 +468,11 @@ export default function(Chart) {
 
 			chart.update();
 
-			var afterZoomCallback = this.getOption(chart, 'callbacks', 'afterZoom');
+			var callbacks = chart.config.options.plugins.crosshair.callbacks
 
-			afterZoomCallback(start, end);
+			if (callbacks && typeof callbacks.afterZoom === 'function') {
+				callbacks.afterZoom(start, end);
+			}
 		},
 
 		drawZoombox: function(chart) {
@@ -470,7 +503,7 @@ export default function(Chart) {
 			var snapEnabled = this.getOption(chart, 'snap', 'enabled');
 
 			var lineX = chart.crosshair.x;
-			var isHoverIntersectOff = chart.config.options.hover.intersect === false;
+			var isHoverIntersectOff = true // TODO: chart.config.options.hover.intersect === false;
 
 			if (snapEnabled && isHoverIntersectOff && chart.active.length) {
 				lineX = chart.active[0]._view.x;
@@ -544,9 +577,35 @@ export default function(Chart) {
 				}
 			}
 
+		},
+		getRightValue: function(rawValue, chart) {
+			// Null and undefined values first
+			if (rawValue === null || rawValue === undefined) {
+				return NaN;
+			}
+			// isNaN(object) returns true, so make sure NaN is checking for a number; Discard Infinite values
+			if ((typeof rawValue === 'number' || rawValue instanceof Number) && !isFinite(rawValue)) {
+				return NaN;
+			}
+
+			// If it is in fact an object, dive in one more level
+			if (rawValue) {
+				const position = chart.config.options.position
+
+				if (position === 'top' || position === 'bottom') {
+					if (rawValue.x !== undefined) {
+						return this.getRightValue(rawValue.x, chart);
+					}
+				} else if (rawValue.y !== undefined) {
+					return this.getRightValue(rawValue.y, chart);
+				}
+			}
+
+			// Value is good, return it
+			return rawValue;
 		}
 
 	};
 
-	Chart.plugins.register(crosshairPlugin);
+	Chart.register(crosshairPlugin);
 }

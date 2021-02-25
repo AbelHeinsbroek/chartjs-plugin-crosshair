@@ -23,7 +23,7 @@ export default function(Chart) {
 			var xScale = chart.scales[meta.xAxisID];
 			var yScale = chart.scales[meta.yAxisID];
 
-			var xValue = xScale.getValueForPixel(e.x);
+			var xValue = xScale.getValueForPixel(e.event.x);
 
 
 			var data = chart.data.datasets[datasetIndex].data;
@@ -75,7 +75,7 @@ export default function(Chart) {
 					return true;
 				},
 				_model: {
-					x: e.x,
+					x: e.event.x,
 					y: yPosition
 				},
 				_datasetIndex: datasetIndex,
