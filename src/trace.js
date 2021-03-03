@@ -212,7 +212,13 @@ export default function(Chart) {
 
 			chart.crosshair.suppressTooltips = e.stop && suppressTooltips;
 
-			chart.crosshair.enabled = (this.getOption(chart, 'line', 'deactivateEvents').every(eventType => e.type !== eventType) && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)));
+			var isActive = (this.getOption(chart, 'line', 'deactivateEvents').every(eventType => e.type !== eventType) && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)));
+			
+			if(this.getOption(chart, 'line', 'positionWhenInactive')) {
+				chart.crosshair.enabled = true;
+			} else {
+				chart.crosshair.enabled = isActive;
+			}
 
 			if (!chart.crosshair.enabled) {
 				if (e.x > xScale.getPixelForValue(xScale.max)) {
@@ -242,7 +248,13 @@ export default function(Chart) {
 				chart.update();
 			}
 
-			chart.crosshair.x = e.x;
+			if (this.getOption(chart, 'line', 'positionWhenInactive') === 'start') {
+				chart.crosshair.x = 0;
+			} else if (this.getOption(chart, 'line', 'positionWhenInactive') === 'end') {
+				chart.crosshair.x = chart.width;
+			} else {
+				chart.crosshair.x = e.x;
+			}
 
 
 			chart.draw();
