@@ -41,9 +41,9 @@
     "yargs": "^14.0.0"
   },
   "peerDependencies": {
-    "chart.js": "3.0.0-beta.11"
+    "chart.js": "3.0.0-beta.13"
   },
   "dependencies": {
-    "chart.js": "3.0.0-beta.11"
+    "chart.js": "3.0.0-beta.13"
   }
 }
