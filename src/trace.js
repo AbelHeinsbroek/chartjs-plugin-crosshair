@@ -1,6 +1,4 @@
-export default function(Chart) {
-	var helpers = Chart.helpers;
-
+export default function(Chart, Helpers) {
 	var defaultOptions = {
 		line: {
 			color: '#F66',
@@ -47,7 +45,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales[xAxes[0]].type
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic' && xScaleType !== 'timeseries') {
 				return;
 			}
 
@@ -118,7 +116,7 @@ export default function(Chart) {
 		},
 
 		getOption: function(chart, category, name) {
-			return helpers.valueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
+			return Helpers.valueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
 		},
 		getXScale: function(chart) {
 			return chart.data.datasets.length ? chart.scales[chart.getDatasetMeta(0).xAxisID] : null;
@@ -179,7 +177,7 @@ export default function(Chart) {
 
 			var xScaleType = chart.config.options.scales[xAxes[0]].type
 
-			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
+			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic' && xScaleType !== 'timeseries') {
 				return;
 			}
 
@@ -593,11 +591,11 @@ export default function(Chart) {
 				const position = chart.config.options.position
 
 				if (position === 'top' || position === 'bottom') {
+					return this.getRightValue(rawValue.y, chart);
+				} else if (rawValue.y !== undefined) {
 					if (rawValue.x !== undefined) {
 						return this.getRightValue(rawValue.x, chart);
 					}
-				} else if (rawValue.y !== undefined) {
-					return this.getRightValue(rawValue.y, chart);
 				}
 			}
 
@@ -607,5 +605,11 @@ export default function(Chart) {
 
 	};
 
-	Chart.register(crosshairPlugin);
+	if (Chart.register) {
+		Chart.register(crosshairPlugin);
+	} else if (Chart.Chart && Chart.Chart.register) {
+		Chart.Chart.register(crosshairPlugin);
+	} else {
+		throw new Error('Cannot register crosshair plugin');
+	}
 }
