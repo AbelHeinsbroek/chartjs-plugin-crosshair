@@ -86,7 +86,9 @@
             }
           }
         },
-
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -114,6 +116,9 @@
     var chart2 = new Chart(document.getElementById("chart2").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -136,6 +141,9 @@
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -158,6 +166,9 @@
     var chart4 = new Chart(document.getElementById("chart4").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "index",
           intersect: false,
@@ -190,6 +201,9 @@
               incrementer: 3 // Defaults to 5 if not included.
             }
           }
+        },
+        animation: {
+          duration: 0
         },
         tooltips: {
           mode: "interpolate",
@@ -274,13 +288,16 @@
             callbacks: {
               afterZoom: function(start, end) { 
                 setTimeout(function() {
-                  const data = generate(start, end)
+                  const data = generate(moment(start), moment(end))
                   chart6.config.data.datasets[0].data = data
                   chart6.update()
                 }, 1000)
               }
             }
           }
+        },
+        animation: {
+          duration: 0
         },
         tooltips: {
           mode: "interpolate",

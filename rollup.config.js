@@ -19,10 +19,11 @@ module.exports = [
 			indent: false,
 			globals: {
 				'chart.js': 'Chart',
+				'chart.js/helpers': 'Helpers',
 			}
 		},
 		external: [
-			'chart.js',
+			'chart.js', 'chart.js/helpers',
 		]
 	},
 	{
@@ -34,6 +35,7 @@ module.exports = [
 			indent: false,
 			globals: {
 				'chart.js': 'Chart',
+				'chart.js/helpers': 'Helpers',
 			}
 		},
 		plugins: [
@@ -44,7 +46,7 @@ module.exports = [
 			})
 		],
 		external: [
-			'chart.js',
+			'chart.js', 'chart.js/helpers',
 		]
 	}
 ];
