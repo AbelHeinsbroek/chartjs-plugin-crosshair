@@ -351,9 +351,10 @@ export default function(Chart, Helpers) {
 			}
 
 			// notify delegate
-			var beforeZoomCallback = this.getOption(chart, 'callbacks', 'beforeZoom');
 
-			if (typeof beforeZoomCallback === 'function' && !beforeZoomCallback(start, end)) {
+			var callbacks = chart.config.options.plugins.crosshair.callbacks
+
+			if (callbacks && typeof callbacks.beforeZoom === 'function' && !callbacks.beforeZoom(start, end)) {
 				return false;
 			}
 
@@ -384,8 +385,6 @@ export default function(Chart, Helpers) {
 				if (xScale.ticks.max && chart.crosshair.originalData.length === undefined) {
 					chart.crosshair.originalXRange.max = xScale.ticks.max;
 				}
-
-
 			}
 
 			if (!chart.crosshair.button) {
@@ -465,8 +464,6 @@ export default function(Chart, Helpers) {
 			}
 
 			chart.update();
-
-			var callbacks = chart.config.options.plugins.crosshair.callbacks
 
 			if (callbacks && typeof callbacks.afterZoom === 'function') {
 				callbacks.afterZoom(start, end);
