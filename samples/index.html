@@ -9,7 +9,7 @@
     <link rel="icon" type="image/ico" href="favicon.ico" />
 
     <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0-beta.13/dist/chart.min.js"></script>
     <script src="../dist/chartjs-plugin-crosshair.js"></script>
   </head>
   <body>
@@ -86,7 +86,9 @@
             }
           }
         },
-
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -114,6 +116,9 @@
     var chart2 = new Chart(document.getElementById("chart2").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -136,6 +141,9 @@
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "interpolate",
           intersect: false,
@@ -158,6 +166,9 @@
     var chart4 = new Chart(document.getElementById("chart4").getContext("2d"), {
       type: "scatter",
       options: {
+        animation: {
+          duration: 0
+        },
         tooltips: {
           mode: "index",
           intersect: false,
@@ -190,6 +201,9 @@
               incrementer: 3 // Defaults to 5 if not included.
             }
           }
+        },
+        animation: {
+          duration: 0
         },
         tooltips: {
           mode: "interpolate",
@@ -272,14 +286,18 @@
               incrementer: 3 // Defaults to 5 if not included.
             },
             callbacks: {
-              afterZoom: function(start, end) {
+              afterZoom: function(start, end) { 
                 setTimeout(function() {
-                  chart6.data.datasets[0].data = generate(start, end)
+                  const data = generate(moment(start), moment(end))
+                  chart6.config.data.datasets[0].data = data
                   chart6.update()
                 }, 1000)
               }
             }
           }
+        },
+        animation: {
+          duration: 0
         },
         tooltips: {
           mode: "interpolate",
@@ -309,8 +327,6 @@
             }
           }]
         },
-
-
         responsiveAnimationDuration: 0
       },
       data: {
@@ -327,7 +343,5 @@
       }]
       }
     });
-
-
   </script>
 </html>
