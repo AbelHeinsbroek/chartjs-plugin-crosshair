@@ -17,6 +17,9 @@
   "files": [
     "dist/chartjs-plugin-crosshair.min.js"
   ],
+  "scripts": {
+    "build": "gulp build"
+  },
   "devDependencies": {
     "@vuepress/plugin-google-analytics": "^1.0.4",
     "eslint-config-chartjs": "^0.3.0",
