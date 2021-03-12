@@ -19,3 +19,8 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Minified JavaScript bundle
+        path: dist/*.min.js
+        if-no-files-found: error
