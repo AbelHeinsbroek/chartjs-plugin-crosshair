@@ -30,6 +30,11 @@ export default function(Chart) {
 			}
 		}
 	};
+	
+	function isShouldIgnorePlugin(chart) {
+		return !chart || !chart.config || !chart.config.options || !chart.config.options.scales ||
+		  !chart.config.options.scales.xAxes || !chart.config.options.scales.xAxes.length;
+	}
 
 	var crosshairPlugin = {
 
@@ -37,7 +42,7 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			if (isShouldIgnorePlugin(chart)) {
 				return
 			}
 
@@ -89,6 +94,9 @@ export default function(Chart) {
 		},
 
 		destroy: function(chart) {
+			if (isShouldIgnorePlugin(chart)) {
+				return;
+			}
 			var syncEnabled = this.getOption(chart, 'sync', 'enabled');
 			if (syncEnabled) {
 				window.removeEventListener('sync-event', chart.crosshair.syncEventHandler);
@@ -127,6 +135,9 @@ export default function(Chart) {
 
 		handleSyncEvent: function(chart, e) {
 
+			if (isShouldIgnorePlugin(chart)) {
+				return;
+			}
 			var syncGroup = this.getOption(chart, 'sync', 'group');
 
 			// stop if the sync event was fired from this chart
@@ -166,7 +177,7 @@ export default function(Chart) {
 
 		afterEvent: function(chart, e) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			if (isShouldIgnorePlugin(chart)) {
 				return
 			}
 
@@ -248,6 +259,9 @@ export default function(Chart) {
 
 		afterDraw: function(chart) {
 
+			if (isShouldIgnorePlugin(chart)) {
+				return;
+			}
 			if (!chart.crosshair.enabled) {
 				return;
 			}
@@ -264,6 +278,9 @@ export default function(Chart) {
 		},
 
 		beforeTooltipDraw: function(chart) {
+			if (isShouldIgnorePlugin(chart)) {
+				return;
+			}
 			// suppress tooltips on dragging
 			return !chart.crosshair.dragStarted && !chart.crosshair.suppressTooltips;
 		},
