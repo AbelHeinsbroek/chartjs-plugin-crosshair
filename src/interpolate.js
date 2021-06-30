@@ -2,7 +2,6 @@ export default function(Chart) {
 
 	Chart.Interaction.modes.interpolate = function(chart, e, options) {
 
-
 		var items = [];
 
 		for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
@@ -64,36 +63,20 @@ export default function(Chart) {
 			// create a 'fake' event point
 
 			var fakePoint = {
-
-				value: interpolatedValue,
-				xValue: xValue,
-
-				tooltipPosition: function() {
-					return this._model;
-				},
 				hasValue: function() {
 					return true;
 				},
-				_model: {
-					x: e.x,
-					y: yPosition
+				tooltipPosition: function() {
+					return this._model
 				},
-				_datasetIndex: datasetIndex,
-				_index: items.length,
-				_xScale: {
-					getLabelForIndex: function(indx) {
-						return items[indx].xValue;
-					}
-				},
-				_yScale: {
-					getLabelForIndex: function(indx) {
-						return items[indx].value;
-					}
-				},
-				_chart: chart
-			};
+				_model: {x: e.x, y: yPosition},
+				skip: false,
+				stop: false,
+				x: xValue,
+				y: interpolatedValue
+			}
 
-			items.push(fakePoint);
+			items.push({datasetIndex: datasetIndex, element: fakePoint, index: 0});
 		}
 
 
@@ -101,7 +84,7 @@ export default function(Chart) {
 		var xItems = Chart.Interaction.modes.x(chart, e, options);
 		for (index = 0; index < xItems.length; index++) {
 			var item = xItems[index];
-			if (!chart.data.datasets[item._datasetIndex].interpolate) {
+			if (!chart.data.datasets[item.datasetIndex].interpolate) {
 				items.push(item);
 			}
 		}
