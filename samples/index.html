@@ -51,6 +51,8 @@
     <h3>Panning Zoom</h3>
     <p>Use left and right arrows to pan!</p>
     <div class="chart"><canvas id="chart5"></canvas></div>
+    <h3>Categorical Axis</h3>
+    <div class="chart"><canvas id="chart7"></canvas></div>
   </body>
 
   <script>
@@ -84,7 +86,7 @@
           crosshair: {
             sync: {
               enabled: false
-            }
+            },
           },
 
           tooltip: {
@@ -102,7 +104,13 @@
               }
             }
           }
-        }   
+        },
+        scales: {
+          x: {
+            min: 2,
+            max: 28
+          }
+        }
       },
       data: {
         datasets: [
@@ -339,6 +347,30 @@
       }]
       }
     });
+
+
+    var chart7 = new Chart(document.getElementById('chart7').getContext("2d"), {
+      type: 'line',
+      options: {
+        plugins: {
+          crosshair: {
+            sync: {
+              enabled: false
+            }
+          }
+        },
+      },
+
+      data: {
+        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+        datasets: [{
+          backgroundColor: 'rgba(0,0,255,0.5)',
+          borderColor: 'rgba(0,0,255,0.5)',
+          showLine: true,
+          data: [1,2,3,2,1,4,2,5,1]
+        }]
+      }
+    })
 
 
   </script>

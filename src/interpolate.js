@@ -24,6 +24,9 @@ export default function(Chart) {
 
 			var xValue = xScale.getValueForPixel(e.x);
 
+			if (xValue > xScale.max || xValue < xScale.min) {
+				continue;
+			}
 
 			var data = chart.data.datasets[datasetIndex].data;
 

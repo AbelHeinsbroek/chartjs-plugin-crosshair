@@ -37,8 +37,8 @@ export default function(Chart) {
 
       afterInit: function(chart) {
         
-        if (!chart.config.options.scales.xAxes) {
-        //  return
+        if (!chart.config.options.scales.x) {
+          return
         }
 
         var xScaleType = chart.config.options.scales.x.type
@@ -61,6 +61,7 @@ export default function(Chart) {
           dragStartX: null,
           dragEndX: null,
           suppressTooltips: false,
+          ignoreNextEvents: 0,
           reset: function() {
             this.resetZoom(chart, false, false);
           }.bind(this)
@@ -151,8 +152,9 @@ export default function(Chart) {
           buttons = 0;
         }
 
+
         var newEvent = {
-          type: e.original.type,
+          type: e.original.type == "click" ? "mousemove" : e.original.type,  // do not transmit click events to prevent unwanted changing of synced charts. We do need to transmit a event to stop zooming on synced charts however.
           chart: chart,
           x: xScale.getPixelForValue(e.xValue),
           y: e.original.y,
@@ -180,12 +182,14 @@ export default function(Chart) {
 
         var xScale = this.getXScale(chart);
 
-
         if (!xScale) {
           return;
         }
 
-
+        if(chart.crosshair.ignoreNextEvents > 0) {
+          chart.crosshair.ignoreNextEvents -= 1
+          return;
+        }
 
         // fix for Safari
         var buttons = (e.native.buttons === undefined ? e.native.which : e.native.buttons);
@@ -219,16 +223,15 @@ export default function(Chart) {
             chart.crosshair.suppressUpdate = true
             chart.update('none');
           }
+          chart.crosshair.dragStarted = false // cancel zoom in progress
           return false;
         }
         chart.crosshair.suppressUpdate = false
 
         // handle drag to zoom
         var zoomEnabled = this.getOption(chart, 'zoom', 'enabled');
-        console.log(e)
 
         if (buttons === 1 && !chart.crosshair.dragStarted && zoomEnabled) {
-          console.log('start drag!')
           chart.crosshair.dragStartX = e.x;
           chart.crosshair.dragStarted = true;
         }
@@ -281,9 +284,12 @@ export default function(Chart) {
         var update = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
         if (update) {
-          for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-            var dataset = chart.data.datasets[datasetIndex];
-            dataset.data = chart.crosshair.originalData.shift(0);
+          if (chart.crosshair.originalData.length > 0) {
+            // reset original data
+            for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
+              var dataset = chart.data.datasets[datasetIndex];
+              dataset.data = chart.crosshair.originalData.shift(0);
+            }
           }
 
           // reset original xRange
@@ -294,7 +300,7 @@ export default function(Chart) {
             delete chart.options.scales.x.min;
           }
           if (chart.crosshair.originalXRange.max) {
-            chart.options.scales.x[0].max = chart.crosshair.originalXRange.max;
+            chart.options.scales.x.max = chart.crosshair.originalXRange.max;
             chart.crosshair.originalXRange.max = null;
           } else {
             delete chart.options.scales.x.max;
@@ -340,25 +346,11 @@ export default function(Chart) {
 
         chart.crosshair.dragStarted = false
 
-        if (chart.options.scales.x.type === 'time') {
-
-          if (chart.options.scales.x.time.min && chart.crosshair.originalData.length === 0) {
-            chart.crosshair.originalXRange.min = chart.options.scales.x.time.min;
-          }
-          if (chart.options.scales.x.time.max && chart.crosshair.originalData.length === 0) {
-            chart.crosshair.originalXRange.max = chart.options.scales.x.time.max;
-          }
-
-        } else {
-
-          if (chart.options.scales.x.ticks.min && chart.crosshair.originalData.length === undefined) {
-            chart.crosshair.originalXRange.min = chart.options.scales.x.ticks.min;
-          }
-          if (chart.options.scales.x.ticks.max && chart.crosshair.originalData.length === undefined) {
-            chart.crosshair.originalXRange.max = chart.options.scales.x.ticks.max;
-          }
-
-
+        if (chart.options.scales.x.min && chart.crosshair.originalData.length === 0) {
+          chart.crosshair.originalXRange.min = chart.options.scales.x.min;
+        }
+        if (chart.options.scales.x.max && chart.crosshair.originalData.length === 0) {
+          chart.crosshair.originalXRange.max = chart.options.scales.x.max;
         }
 
         if (!chart.crosshair.button) {
@@ -383,48 +375,56 @@ export default function(Chart) {
         chart.options.scales.x.max = end;
 
         // make a copy of the original data for later restoration
+
         var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
-        // filter dataset
-        
-        for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
-          var newData = [];
 
-          var index = 0;
-          var started = false;
-          var stop = false;
-          if (storeOriginals) {
-            chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data;
+        var filterDataset = (chart.config.options.scales.x.type !== 'category')
+
+        if(filterDataset) {
+
+
+          for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
+
+            var newData = [];
+
+            var index = 0;
+            var started = false;
+            var stop = false;
+            if (storeOriginals) {
+              chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data;
+            }
+
+            var sourceDataset = chart.crosshair.originalData[datasetIndex];
+
+            for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
+
+              var oldData = sourceDataset[oldDataIndex];
+              // var oldDataX = this.getXScale(chart).getRightValue(oldData)
+              var oldDataX = oldData.x !== undefined ? oldData.x : NaN
+
+              // append one value outside of bounds
+              if (oldDataX >= start && !started && index > 0) {
+                newData.push(sourceDataset[index - 1]);
+                started = true;
+              }
+              if (oldDataX >= start && oldDataX <= end) {
+                newData.push(oldData);
+              }
+              if (oldDataX > end && !stop && index < sourceDataset.length) {
+                newData.push(oldData);
+                stop = true;
+              }
+              index += 1;
+            }
+
+            chart.data.datasets[datasetIndex].data = newData;
           }
-
-          var sourceDataset = chart.crosshair.originalData[datasetIndex];
-
-          for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
-
-            var oldData = sourceDataset[oldDataIndex];
-            // var oldDataX = this.getXScale(chart).getRightValue(oldData)
-            var oldDataX = oldData.x !== undefined ? oldData.x : NaN
-
-            // append one value outside of bounds
-            if (oldDataX >= start && !started && index > 0) {
-              newData.push(sourceDataset[index - 1]);
-              started = true;
-            }
-            if (oldDataX >= start && oldDataX <= end) {
-              newData.push(oldData);
-            }
-            if (oldDataX > end && !stop && index < sourceDataset.length) {
-              newData.push(oldData);
-              stop = true;
-            }
-            index += 1;
-          }
-
-          chart.data.datasets[datasetIndex].data = newData;
         }
 
         chart.crosshair.start = start;
         chart.crosshair.end = end;
+
 
         if (storeOriginals) {
           var xAxes = this.getXScale(chart);
@@ -432,7 +432,10 @@ export default function(Chart) {
           chart.crosshair.max = xAxes.max;
         }
 
+        chart.crosshair.ignoreNextEvents = 2 // ignore next 2 events to prevent starting a new zoom action after updating the chart
+
         chart.update('none');
+
 
         var afterZoomCallback = this.getOption(chart, 'callbacks', 'afterZoom');
 
@@ -467,11 +470,9 @@ export default function(Chart) {
         var snapEnabled = this.getOption(chart, 'snap', 'enabled');
 
         var lineX = chart.crosshair.x;
-        //var isHoverIntersectOff = chart.config.options.hover.intersect === false;
-        var isHoverIntersectOff = true
 
-        if (snapEnabled && isHoverIntersectOff && chart.active.length) {
-          lineX = chart.active[0]._view.x;
+        if (snapEnabled && chart._active.length) {
+          lineX = chart._active[0].element.x;
         }
 
         chart.ctx.beginPath();
