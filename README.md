@@ -8,7 +8,7 @@
 
 [Chart.js](http://www.chartjs.org/) plugin to draw vertical crosshair, zoom, interpolate values and sync chart interactions.
 
-Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or later.
+Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **3.4.0** or later.
 
 ## Documentation
 
@@ -23,11 +23,11 @@ new Chart(ctx, {
   // ... data ...
   options: {
     // ... other options ...
-    tooltips: {
-      mode: 'interpolate',
-      intersect: false
-    },
     plugins: {
+      tooltip: {
+        mode: 'interpolate',
+        intersect: false
+      },
       crosshair: {
         line: {
           color: '#F66',  // crosshair line color
@@ -46,10 +46,10 @@ new Chart(ctx, {
           zoomButtonClass: 'reset-zoom',                      // reset zoom button class
         },
         callbacks: {
-          beforeZoom: function(start, end) {                  // called before zoom, return false to prevent zoom
+          beforeZoom: () => function(start, end) {                  // called before zoom, return false to prevent zoom
             return true;
           },
-          afterZoom: function(start, end) {                   // called after zoom
+          afterZoom: () => function(start, end) {                   // called after zoom
           }
         }
       }
