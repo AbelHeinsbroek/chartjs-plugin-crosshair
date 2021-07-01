@@ -44,6 +44,6 @@
     "chart.js": "^3.4.0"
   },
   "dependencies": {
-    "chart.js": "^3.4.3"
+    "chart.js": "^3.4.0"
   }
 }
