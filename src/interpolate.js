@@ -84,7 +84,7 @@ export default function(Interaction) {
 
 
 		// add other, not interpolated, items
-		var xItems = Chart.Interaction.modes.x(chart, e, options);
+		var xItems = Interaction.modes.x(chart, e, options);
 		for (index = 0; index < xItems.length; index++) {
 			var item = xItems[index];
 			if (!chart.data.datasets[item.datasetIndex].interpolate) {
