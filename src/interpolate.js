@@ -1,6 +1,6 @@
-export default function(Chart) {
+export default function(Interaction) {
 
-	Chart.Interaction.modes.interpolate = function(chart, e, options) {
+	Interaction.modes.interpolate = function(chart, e, options) {
 
 		var items = [];
 
