@@ -12,7 +12,7 @@
 
 By default, `https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair` returns the latest (minified) version, however it's [**highly recommended**](https://www.jsdelivr.com/features) to always specify a version in order to avoid breaking changes. This can be achieved by appending `@{version}` to the url:
 
-    https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.1.2    // exact version
+    https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.2.0    // exact version
     https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1        // latest 1.x.x
 
 Read more about jsDeliver versioning on their [website](http://www.jsdelivr.com/).
@@ -25,3 +25,29 @@ You can download the latest version of `chartjs-plugin-crosshair` from the [GitH
 
 - `chartjs-plugin-crosshair.js` (recommended for development)
 - `chartjs-plugin-crosshair.min.js` (recommended for production)
+
+# Integration
+
+
+chartjs-plugin-crosshair can be integrated with plain JavaScript or with different module loaders. The examples below show how to load the plugin in different systems.
+
+## Script Tag
+
+```html
+<script src="path/to/chartjs/dist/chart.min.js"></script>
+<script src="path/to/chartjs-plugin-crosshair/dist/chartjs-plugin-crosshair.min.js"></script>
+<script>
+    var myChart = new Chart(ctx, {...});
+</script>
+```
+
+## Bundlers (Webpack, Rollup, etc.)
+
+```js
+import { Chart, Interaction } from 'chart.js';
+import {CrosshairPlugin,Interpolate} from 'chartjs-plugin-crosshair';
+
+Chart.register(CrosshairPlugin);
+Interaction.modes.interpolate = Interpolate
+```
+

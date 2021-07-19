@@ -1,19 +1,19 @@
 <div align="center">
     <centering>
-    <img src="./header.png" width='600px'/>
+    <img src="header.png" width='600px'/>
     </centering>
 </div>
 
 
 [Chart.js](http://www.chartjs.org/) plugin to draw vertical crosshair, zoom, interpolate values and sync chart interactions.
 
-Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **2.6.0** or later.
+Requires [Chart.js](https://github.com/chartjs/Chart.js/releases) **3.4.0** or later.
 
 ## Documentation
 
-* [Installation](installation.md)
-* [Options](options.md)
-* [Samples](https://chartjs-plugin-crosshair.netlify.com/samples)
+- [Installation](https://chartjs-plugin-crosshair.netlify.com/installation)
+- [Options](https://chartjs-plugin-crosshair.netlify.com/options)
+- [Samples](https://chartjs-plugin-crosshair.netlify.com/samples)
 
 ## Example
 
@@ -22,16 +22,15 @@ new Chart(ctx, {
   // ... data ...
   options: {
     // ... other options ...
-    tooltips: {
-      mode: 'interpolate',
-      intersect: false
-    },
     plugins: {
+      tooltip: {
+        mode: 'interpolate',
+        intersect: false
+      },
       crosshair: {
         line: {
-          color: '#F66',        // crosshair line color
-          width: 1,             // crosshair line width
-          dashPattern: [5, 5]   // crosshair line dash pattern
+          color: '#F66',  // crosshair line color
+          width: 1        // crosshair line width
         },
         sync: {
           enabled: true,            // enable trace line syncing with other charts
@@ -46,10 +45,10 @@ new Chart(ctx, {
           zoomButtonClass: 'reset-zoom',                      // reset zoom button class
         },
         callbacks: {
-          beforeZoom: function(start, end) {                  // called before zoom, return false to prevent zoom
+          beforeZoom: () => function(start, end) {                  // called before zoom, return false to prevent zoom
             return true;
           },
-          afterZoom: function(start, end) {                   // called after zoom
+          afterZoom: () => function(start, end) {                   // called after zoom
           }
         }
       }
@@ -76,5 +75,4 @@ The following commands will then be available from the repository root:
 
 ## License
 
-`chartjs-plugin-crosshair` is available under the [MIT license](https://github.com/abelheinsbroek/chartjs-plugin-crosshair/blob/master/LICENSE.md).
-
+`chartjs-plugin-crosshair` is available under the [MIT license](LICENSE.md).

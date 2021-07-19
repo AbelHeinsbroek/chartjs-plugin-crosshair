@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="index.css" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.min.js"></script>
     <script src="../dist/chartjs-plugin-crosshair.js"></script>
   </head>
   <body>
@@ -49,6 +49,7 @@
         borderColor: color,
         showLine: true,
         fill: false,
+        tension: 0.1,
         pointRadius: 2,
         label,
         data,
@@ -69,17 +70,17 @@
             snap: {
               enabled: true
             }
-          }
+          },
+          tooltip: {
+            mode: "index",
+            intersect: false,
+          },
         },
 
         hover: {
           intersect: false
         },
 
-        tooltips: {
-          mode: "index",
-          intersect: false,
-        },
 
       },
       data: {

@@ -16,10 +16,12 @@ The `interpolation` mode can be enabled by setting the tooltips mode to
 ```js
 options: {
   ...
-  tooltips: {
-    mode: 'interpolate',
-    intersect: false
-  }
+  plugins: {
+    tooltip: {
+      mode: 'interpolate',
+      intersect: false
+    }
+  }   
 }
 ```
 

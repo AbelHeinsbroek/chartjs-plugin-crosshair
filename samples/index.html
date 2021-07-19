@@ -8,8 +8,9 @@
     <link rel="stylesheet" type="text/css" href="index.css" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
 
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
     <script src="../dist/chartjs-plugin-crosshair.js"></script>
   </head>
   <body>
@@ -50,6 +51,8 @@
     <h3>Panning Zoom</h3>
     <p>Use left and right arrows to pan!</p>
     <div class="chart"><canvas id="chart5"></canvas></div>
+    <h3>Categorical Axis</h3>
+    <div class="chart"><canvas id="chart7"></canvas></div>
   </body>
 
   <script>
@@ -83,22 +86,29 @@
           crosshair: {
             sync: {
               enabled: false
+            },
+          },
+
+          tooltip: {
+            animation: false,
+            mode: "interpolate",
+            intersect: false,
+            callbacks: {
+              title: function(a, d) {
+                return a[0].element.x.toFixed(2);
+              },
+              label: function(d) {
+                return (
+                  d.chart.data.datasets[d.datasetIndex].label + ": " + d.element.y.toFixed(2)
+                );
+              }
             }
           }
         },
-
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.toFixed(2);
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
-            }
+        scales: {
+          x: {
+            min: 2,
+            max: 28
           }
         }
       },
@@ -114,17 +124,20 @@
     var chart2 = new Chart(document.getElementById("chart2").getContext("2d"), {
       type: "scatter",
       options: {
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.toFixed(2);
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
+        plugins: {
+          tooltip: {
+            animation: false,
+            mode: "interpolate",
+            intersect: false,
+            callbacks: {
+              title: function(a, d) {
+                return a[0].element.x.toFixed(2);
+              },
+              label: function(d) {
+                return (
+                  d.chart.data.datasets[d.datasetIndex].label + ": " + d.element.y.toFixed(2)
+                );
+              }
             }
           }
         }
@@ -136,20 +149,23 @@
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"), {
       type: "scatter",
       options: {
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.toFixed(2);
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
+        plugins: {
+          tooltip: {
+            animation: false,
+            mode: "interpolate",
+            intersect: false,
+            callbacks: {
+              title: function(a, d) {
+                return a[0].element.x.toFixed(2);
+              },
+              label: function(d) {
+                return (
+                  d.chart.data.datasets[d.datasetIndex].label + ": " + d.element.y.toFixed(2)
+                );
+              }
             }
           }
-        }
+        },
       },
       data: {
         datasets: [generateDataset(1, "B", "green")]
@@ -158,17 +174,20 @@
     var chart4 = new Chart(document.getElementById("chart4").getContext("2d"), {
       type: "scatter",
       options: {
-        tooltips: {
-          mode: "index",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.toFixed(2);
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
+        plugins: {
+          tooltip: {
+            animation: false,
+            mode: "interpolate",
+            intersect: false,
+            callbacks: {
+              title: function(a, d) {
+                return a[0].element.x.toFixed(2);
+              },
+              label: function(d) {
+                return (
+                  d.chart.data.datasets[d.datasetIndex].label + ": " + d.element.y.toFixed(2)
+                );
+              }
             }
           }
         }
@@ -189,19 +208,20 @@
             pan: {
               incrementer: 3 // Defaults to 5 if not included.
             }
-          }
-        },
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
-          callbacks: {
-            title: function(a, d) {
-              return a[0].xLabel.toFixed(2);
-            },
-            label: function(i, d) {
-              return (
-                d.datasets[i.datasetIndex].label + ": " + i.yLabel.toFixed(2)
-              );
+          },
+          tooltip: {
+            animation: false,
+            mode: "interpolate",
+            intersect: false,
+            callbacks: {
+              title: function(a, d) {
+                return a[0].element.x.toFixed(2);
+              },
+              label: function(d) {
+                return (
+                  d.chart.data.datasets[d.datasetIndex].label + ": " + d.element.y.toFixed(2)
+                );
+              }
             }
           }
         },
@@ -230,13 +250,13 @@
 
     window.addEventListener("keydown", panZoom);
     
-    function generate(x1,x2) {
+    function generate(x1,x2,init) {
 
       if(moment.isMoment(x1)) {
         // translate time to x1, x2
         x1 = -2 - moment().add(-2*86400, 'seconds').diff(x1, 'seconds') / 86400
         x2 = 2 - moment().add(2*86400, 'seconds').diff(x2, 'seconds') / 86400
-      }
+      } 
 
       var data = [];
       var x = x1;
@@ -272,16 +292,16 @@
               incrementer: 3 // Defaults to 5 if not included.
             },
             callbacks: {
-              afterZoom: function(start, end) {
+              afterZoom: () => function(start, end) {
                 setTimeout(function() {
-                  chart6.data.datasets[0].data = generate(start, end)
+                  chart6.data.datasets[0].data = generate(moment(start), moment(end))
                   chart6.update()
                 }, 1000)
               }
             }
           }
         },
-        tooltips: {
+        tooltip: {
           mode: "interpolate",
           intersect: false,
           callbacks: {
@@ -299,15 +319,15 @@
           duration: 0
         },
         scales: {
-          xAxes: [{
+          x: {
             type: 'time'
-          }],
-          yAxes: [{
+          },
+          y: {
             ticks: {
               min: -3,
               max: 4
             }
-          }]
+          }
         },
 
 
@@ -327,6 +347,30 @@
       }]
       }
     });
+
+
+    var chart7 = new Chart(document.getElementById('chart7').getContext("2d"), {
+      type: 'line',
+      options: {
+        plugins: {
+          crosshair: {
+            sync: {
+              enabled: false
+            }
+          }
+        },
+      },
+
+      data: {
+        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+        datasets: [{
+          backgroundColor: 'rgba(0,0,255,0.5)',
+          borderColor: 'rgba(0,0,255,0.5)',
+          showLine: true,
+          data: [1,2,3,2,1,4,2,5,1]
+        }]
+      }
+    })
 
 
   </script>

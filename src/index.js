@@ -1,8 +1,8 @@
-import Chart from 'chart.js';
+import {Chart, Interaction} from 'chart.js';
 
 import Interpolate from './interpolate.js';
 import TracePlugin from './trace.js';
 
 // install plugins
-Interpolate(Chart);
-TracePlugin(Chart);
+Chart.register(TracePlugin)
+Interaction.modes.interpolate = Interpolate
