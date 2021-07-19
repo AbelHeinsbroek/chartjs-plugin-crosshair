@@ -7,8 +7,18 @@ const banner = `/*!
  * (c) ${new Date().getFullYear()} Chart.js Contributors
  * Released under the ${pkg.license} license
  */`;
+ 
+ const external = [
+  'chart.js',
+  'chart.js/helpers'
+];
+const globals = {
+  'chart.js': 'Chart',
+  'chart.js/helpers': 'Chart.helpers'
+}
 
 module.exports = [
+
 	{
 		input: 'src/index.js',
 		output: {
@@ -17,14 +27,11 @@ module.exports = [
 			banner: banner,
 			format: 'umd',
 			indent: false,
-			globals: {
-				'chart.js': 'Chart',
-			}
+			globals: globals
 		},
-		external: [
-			'chart.js',
-		]
+		external: external
 	},
+
 	{
 		input: 'src/index.js',
 		output: {
@@ -32,19 +39,25 @@ module.exports = [
 			file: `dist/${pkg.name}.min.js`,
 			format: 'umd',
 			indent: false,
-			globals: {
-				'chart.js': 'Chart',
-			}
-		},
-		plugins: [
-			terser({
-				output: {
-					preamble: banner
-				}
-			})
-		],
-		external: [
-			'chart.js',
-		]
-	}
+			globals: globals,
+			},
+			plugins: [
+				terser({
+					output: {
+						preamble: banner
+					}
+				})
+			],
+			external: external
+	},
+	{
+    input: 'src/index.esm.js',
+    output: {
+      name: 'ChartCrosshair',
+      file: `dist/${pkg.name}.esm.js`,
+      format: 'esm',
+      indent: false
+    },
+    external: external
+  },
 ];

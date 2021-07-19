@@ -5,6 +5,7 @@
   "version": "1.2.0",
   "license": "MIT",
   "main": "dist/chartjs-plugin-crosshair.js",
+  "module": "dist/chartjs-plugin-crosshair.esm.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/abelheinsbroek/chartjs-plugin-crosshair.git"
@@ -15,7 +16,7 @@
     "crosshair"
   ],
   "files": [
-    "dist/chartjs-plugin-crosshair.min.js"
+    "dist/*.js"
   ],
   "devDependencies": {
     "@vuepress/plugin-google-analytics": "^1.0.4",
@@ -41,9 +42,6 @@
     "yargs": "^14.0.0"
   },
   "peerDependencies": {
-    "chart.js": "^3.4.0"
-  },
-  "dependencies": {
     "chart.js": "^3.4.0"
   }
 }

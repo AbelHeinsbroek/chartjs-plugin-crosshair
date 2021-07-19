@@ -4,5 +4,5 @@ import Interpolate from './interpolate.js';
 import TracePlugin from './trace.js';
 
 // install plugins
-Interpolate(Interaction);
-TracePlugin(Chart);
+Chart.register(TracePlugin)
+Interaction.modes.interpolate = Interpolate

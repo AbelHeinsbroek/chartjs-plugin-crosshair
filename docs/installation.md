@@ -25,3 +25,29 @@ You can download the latest version of `chartjs-plugin-crosshair` from the [GitH
 
 - `chartjs-plugin-crosshair.js` (recommended for development)
 - `chartjs-plugin-crosshair.min.js` (recommended for production)
+
+# Integration
+
+
+chartjs-plugin-crosshair can be integrated with plain JavaScript or with different module loaders. The examples below show how to load the plugin in different systems.
+
+## Script Tag
+
+```html
+<script src="path/to/chartjs/dist/chart.min.js"></script>
+<script src="path/to/chartjs-plugin-crosshair/dist/chartjs-plugin-crosshair.min.js"></script>
+<script>
+    var myChart = new Chart(ctx, {...});
+</script>
+```
+
+## Bundlers (Webpack, Rollup, etc.)
+
+```js
+import { Chart, Interaction } from 'chart.js';
+import {crosshairPlugin,interpolateMode} from 'chartjs-plugin-crosshair';
+
+Chart.register(crosshairPlugin);
+Interaction.modes.interpolate = interpolateMode
+```
+
