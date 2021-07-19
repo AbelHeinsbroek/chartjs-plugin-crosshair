@@ -45,9 +45,9 @@ chartjs-plugin-crosshair can be integrated with plain JavaScript or with differe
 
 ```js
 import { Chart, Interaction } from 'chart.js';
-import {crosshairPlugin,interpolateMode} from 'chartjs-plugin-crosshair';
+import {CrosshairPlugin,Interpolate} from 'chartjs-plugin-crosshair';
 
-Chart.register(crosshairPlugin);
-Interaction.modes.interpolate = interpolateMode
+Chart.register(CrosshairPlugin);
+Interaction.modes.interpolate = Interpolate
 ```
 

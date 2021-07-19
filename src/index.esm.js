@@ -1,5 +1,5 @@
 import Interpolate from './interpolate.js';
-import TracePlugin from './trace.js';
+import CrosshairPlugin from './trace.js';
 
-export default TracePlugin
-export {Interpolate, TracePlugin}
+export default CrosshairPlugin
+export {CrosshairPlugin, Interpolate}
