@@ -1,4 +1,3 @@
-
 export default function(Chart) {
 
   var helpers = Chart.helpers
@@ -22,7 +21,8 @@ export default function(Chart) {
       // prevent redrawing of chart if tooltips are disabled
       chart.preventNextRender = (e.type == 'mousemove')
       // update tooltip
-      if (Chart.plugins.notify(chart, 'beforeTooltipDraw')) {
+
+      if (chart.notifyPlugins('beforeTooltipDraw', {cancelable: true})) {
         this.updateTooltip(chart, e)
       } else {
         // hide tooltip
@@ -48,11 +48,13 @@ export default function(Chart) {
 			return chart.scales[chart.getDatasetMeta(0).yAxisID];
 		},
 
-    updateTooltip: function(chart, e) {
+    updateTooltip: function(chart, evt) {
+
+      let e = evt.event
 
       // update tooltip
       chart.tooltip.update()
-      var model = chart.tooltip._model
+      var model = chart.tooltip
       var tooltipDiv = chart.fasttooltip.tooltipDiv
 
       if (chart.tooltip._active.length == 0) {
@@ -95,5 +97,5 @@ export default function(Chart) {
   }
 
 
-	Chart.plugins.register(FastTooltipPlugin);
+	Chart.register(FastTooltipPlugin);
 }

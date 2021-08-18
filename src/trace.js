@@ -1,5 +1,4 @@
 export default function(Chart) {
-	var helpers = Chart.helpers;
 
 	var defaultOptions = {
 		callbacks: {
@@ -19,7 +18,7 @@ export default function(Chart) {
 
 		afterInit: function(chart) {
 
-			if (chart.config.options.scales.xAxes.length == 0) {
+			if (chart.config.options.scales.x == undefined) {
 				return
 			}
 
@@ -44,7 +43,7 @@ export default function(Chart) {
 				zoomHandleDiv.appendChild(zoomHandleCorner)
 			}
 
-			var xScaleType = chart.config.options.scales.xAxes[0].type
+			var xScaleType = chart.config.options.scales.x.type
 
 			if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
 				return;
@@ -72,6 +71,8 @@ export default function(Chart) {
 
 		afterDatasetsUpdate: function(chart, dataset) {
 			// remove existing tracepoints
+			if(!chart.crosshair) { return }
+
 			for(var index in chart.crosshair.tracePointDivs) {
 				const el = chart.crosshair.tracePointDivs[index]
 				el.parentNode.removeChild(el)
@@ -87,7 +88,10 @@ export default function(Chart) {
 			}
 		},
 
-		afterEvent: function(chart, e) {
+		afterEvent: function(chart, evt) {
+			if(!chart.crosshair) { return }
+
+			let e = evt.event
 
 			var xScale = this.getXScale(chart)
 			var yScale = this.getYScale(chart)
@@ -132,7 +136,7 @@ export default function(Chart) {
 					this.doHorizontalZoom(chart, start, end);
 					// fire new event to force redrawing of tooltip and tracepoints
 					var newEvent = {type: 'mouseover', chart: chart, x: e.x, y: e.y, target: e.native.target, native: e.native}
-					chart.controller.eventHandler(newEvent)
+					chart._eventHandler(newEvent)
 				}
 				if ((chart.crosshair.dragMode == 'vertical') || (chart.crosshair.dragMode == 'both') && Math.abs(chart.crosshair.dragStartY - chart.crosshair.y) > 1) {
 					var start = yScale.getValueForPixel(chart.crosshair.dragStartY);
@@ -140,7 +144,6 @@ export default function(Chart) {
 					this.doVerticalZoom(chart, start, end)
 				}
 			}
-
 
 			this.updateZoomBox(chart)
 			if(!chart.crosshair.dragStarted) {
@@ -152,6 +155,8 @@ export default function(Chart) {
 			return true
 		},
 		beforeTooltipDraw: function(chart) {
+			if(!chart.crosshair) { return }
+
 			return !chart.crosshair.dragStarted
 		},
 		doVerticalZoom: function(chart, start, end) {
@@ -163,9 +168,9 @@ export default function(Chart) {
 				end = tmp;
 			}
 
-			chart.options.scales.yAxes[0].ticks.min = start
-			chart.options.scales.yAxes[0].ticks.max = end
-			console.log(chart.options.scales)
+			var yScale = this.getYScale(chart)
+			yScale.min = start
+			yScale.max = end
 			chart.update(0)
 
 			var afterZoomCallback = this.getOption(chart, 'callbacks', 'afterVerticalZoom');
@@ -180,13 +185,16 @@ export default function(Chart) {
 				end = tmp;
 			}
 
-			var beforeZoomCallback = helpers.getValueOrDefault(chart.options.plugins.crosshair.callbacks ? chart.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
+
+			var beforeZoomCallback = this.valueOrDefault(chart.options.plugins.crosshair.callbacks ? chart.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
 
 			if (!beforeZoomCallback(start, end)) {
 				return false;
 			}
-			// clip dataset
+			chart.options.scales.x.min = start;
+			chart.options.scales.x.max = end;
 
+			// clip dataset
 			for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 				var newData = [];
 
@@ -198,7 +206,8 @@ export default function(Chart) {
 
 				for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
 					var oldData = sourceDataset[oldDataIndex];
-					var oldDataX = this.getXScale(chart).getRightValue(oldData)
+					//var oldDataX = this.getXScale(chart).getRightValue(oldData)
+				  var oldDataX = oldData.x !== undefined ? oldData.x : NaN
 
 					// append one value outside of bounds
 					if (oldDataX >= start && !started && index > 0) {
@@ -220,13 +229,11 @@ export default function(Chart) {
 
 			}
 
+			var xAxes = this.getXScale(chart);
+			chart.crosshair.min = xAxes.min;
+			chart.crosshair.max = xAxes.max;
 
-
-			chart.options.scales.xAxes[0].ticks.min = start
-			chart.options.scales.xAxes[0].ticks.max = end
-
-
-			chart.update(0)
+			chart.update('none')
 
 			var afterZoomCallback = this.getOption(chart, 'callbacks', 'afterZoom');
 			afterZoomCallback(start, end);
@@ -332,17 +339,18 @@ export default function(Chart) {
 			var yScale = this.getYScale(chart)
 
 			for(var pointIndex in active) {
-				const activePoint = active[pointIndex]
-				const dataset = chart.data.datasets[activePoint._datasetIndex];
-				const meta = chart.getDatasetMeta(activePoint._datasetIndex)
+				const activePoint = active[pointIndex].element
+				const dataset = chart.data.datasets[active[pointIndex].datasetIndex];
+				const meta = chart.getDatasetMeta(active[pointIndex].datasetIndex)
+
+				if (meta.hidden || !dataset.interpolate) {
+					continue
+				}
 
 				const model = activePoint._model
 
 				const outOfBounds = (model.y > yScale.getPixelForValue(yScale.min) || model.y < yScale.getPixelForValue(yScale.max))
 
-				if (meta.hidden || !dataset.interpolate) {
-					continue
-				}
 				if (outOfBounds) {
 					chart.crosshair.tracePointDivs[pointIndex].style.display = "none"
 					continue
@@ -378,7 +386,7 @@ export default function(Chart) {
 		},
 
 		getOption: function(chart, category, name) {
-			return helpers.getValueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
+			return this.valueOrDefault(chart.options.plugins.crosshair[category] ? chart.options.plugins.crosshair[category][name] : undefined, defaultOptions[category][name]);
 		},
 
 		getXScale: function(chart) {
@@ -387,9 +395,12 @@ export default function(Chart) {
 		getYScale: function(chart) {
 			return chart.scales[chart.getDatasetMeta(0).yAxisID];
 		},
+		valueOrDefault: function(value, defaultValue) {
+			return typeof value === 'undefined' ? defaultValue : value;
+		}
 
 	};
 
 
-	Chart.plugins.register(crosshairPlugin);
+	Chart.register(crosshairPlugin);
 }

@@ -1,7 +1,6 @@
-export default function(Chart) {
+export default function(Interaction) {
 
-	Chart.Interaction.modes.interpolate = function(chart, e, options) {
-
+	Interaction.modes.interpolate = function(chart, e, options) {
 
 		var items = [];
 
@@ -25,6 +24,9 @@ export default function(Chart) {
 
 			var xValue = xScale.getValueForPixel(e.x);
 
+			if (xValue > xScale.max || xValue < xScale.min) {
+				continue;
+			}
 
 			var data = chart.data.datasets[datasetIndex].data;
 
@@ -36,6 +38,7 @@ export default function(Chart) {
 				continue;
 			}
 
+			
 			// linear interpolate value
 			var prev = data[index - 1];
 			var next = data[index];
@@ -45,7 +48,7 @@ export default function(Chart) {
 				var interpolatedValue = prev.y + (xValue - prev.x) * slope;
 			}
 
-			if (chart.data.datasets[datasetIndex].steppedLine && prev) {
+			if (chart.data.datasets[datasetIndex].stepped && prev) {
 				interpolatedValue = prev.y;
 			}
 
@@ -63,44 +66,29 @@ export default function(Chart) {
 			// create a 'fake' event point
 
 			var fakePoint = {
-
-				value: interpolatedValue,
-				xValue: xValue,
-
-				tooltipPosition: function() {
-					return this._model;
-				},
 				hasValue: function() {
 					return true;
 				},
-				_model: {
-					x: e.x,
-					y: yPosition
+				tooltipPosition: function() {
+					return this._model
 				},
-				_datasetIndex: datasetIndex,
-				_index: items.length,
-				_xScale: {
-					getLabelForIndex: function(indx) {
-						return items[indx].xValue;
-					}
-				},
-				_yScale: {
-					getLabelForIndex: function(indx) {
-						return items[indx].value;
-					}
-				},
-				_chart: chart
-			};
+				parsed: {x: xValue, y: interpolatedValue},
+				_model: {x: e.x, y: yPosition},
+				skip: false,
+				stop: false,
+				x: xValue,
+				y: interpolatedValue
+			}
 
-			items.push(fakePoint);
+			items.push({datasetIndex: datasetIndex, element: fakePoint, index: 0});
 		}
 
 
 		// add other, not interpolated, items
-		var xItems = Chart.Interaction.modes.x(chart, e, options);
+		var xItems = Interaction.modes.x(chart, e, options);
 		for (index = 0; index < xItems.length; index++) {
 			var item = xItems[index];
-			if (!chart.data.datasets[item._datasetIndex].interpolate) {
+			if (!chart.data.datasets[item.datasetIndex].interpolate) {
 				items.push(item);
 			}
 		}

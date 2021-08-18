@@ -1,7 +1,8 @@
 export default function(Chart) {
 
-
   var syncPlugin = {
+
+    id: 'sync',
 
     syncGroups: {},
 
@@ -21,8 +22,10 @@ export default function(Chart) {
       this.unsubscribe(chart)
     },
 
-    afterEvent: function(chart, e) {
+    afterEvent: function(chart, evt) {
       // sync!
+      var e = evt.event
+
       var xScale = this.getXScale(chart)
 
       if(!e.halt) {
@@ -61,12 +64,13 @@ export default function(Chart) {
 
       chart.sync.blockNextTooltip = true
 
-      chart.controller.eventHandler(newEvent)
+      chart._eventHandler(newEvent)
     },
 
     beforeTooltipDraw: function(chart) {
+
       if (chart.sync.blockNextTooltip) {
-        chart.sync.blockNextTooltip = false
+        chart.sync.blockNextTooltip = false 
         return false
       }
       return true
@@ -82,12 +86,11 @@ export default function(Chart) {
     unsubscribe: function(chart) {
       const index = this.syncGroups[chart.sync.group].indexOf(chart)
       if (index > -1) {
-        console.log('unsubscribe')
         this.syncGroups[chart.sync.group].splice(index, 1)
       }
 
     }
   }
 
-	Chart.plugins.register(syncPlugin);
+	Chart.register(syncPlugin);
 }
