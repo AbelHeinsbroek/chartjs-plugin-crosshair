@@ -178,7 +178,7 @@ export default {
 
     var xScaleType = xScaleOptions.type
 
-    if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
+    if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') {
       return;
     }
 
@@ -281,6 +281,7 @@ export default {
   },
 
   resetZoom: function(chart) {
+    const xAxisName = chart.config.options.scales.x ? 'x' : chart.config.options.scales.xAxes ? 'xAxes' : undefined;
 
     var stop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     var update = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
@@ -296,16 +297,16 @@ export default {
 
       // reset original xRange
       if (chart.crosshair.originalXRange.min) {
-        chart.options.scales.x.min = chart.crosshair.originalXRange.min;
+        chart.options.scales[xAxisName].min = chart.crosshair.originalXRange.min;
         chart.crosshair.originalXRange.min = null;
       } else {
-        delete chart.options.scales.x.min;
+        delete chart.options.scales[xAxisName].min;
       }
       if (chart.crosshair.originalXRange.max) {
-        chart.options.scales.x.max = chart.crosshair.originalXRange.max;
+        chart.options.scales[xAxisName].max = chart.crosshair.originalXRange.max;
         chart.crosshair.originalXRange.max = null;
       } else {
-        delete chart.options.scales.x.max;
+        delete chart.options.scales[xAxisName].max;
       }
     }
 
@@ -330,37 +331,39 @@ export default {
     }
   },
 
+
   doZoom: function(chart, start, end) {
-    const xScaleOptions = chart.config.options.scales.x || chart.config.options.scales.xAxes;
+    const xAxisName = chart.config.options.scales.x ? 'x' : chart.config.options.scales.xAxes ? 'xAxes' : undefined;
+    const xScaleOptions = chart.config.options.scales[xAxisName];
     // swap start/end if user dragged from right to left
     if (start > end) {
       var tmp = start;
       start = end;
       end = tmp;
     }
-
+    
     // notify delegate
-    var beforeZoomCallback = valueOrDefault(chart.options.plugins.crosshair.callbacks ? chart.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
+    var beforeZoomCallback = valueOrDefault(chart.config.options.plugins.crosshair.callbacks ? chart.config.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
 
     if (!beforeZoomCallback(start, end)) {
       return false;
     }
 
-    chart.crosshair.dragStarted = false
+    chart.crosshair.dragStarted = false;
 
-    if (chart.options.scales.x.min && chart.crosshair.originalData.length === 0) {
-      chart.crosshair.originalXRange.min = chart.options.scales.x.min;
+    if (chart.options.scales[xAxisName].min && chart.crosshair.originalData.length === 0) {
+      chart.crosshair.originalXRange.min = chart.options.scales[xAxisName].min;
     }
-    if (chart.options.scales.x.max && chart.crosshair.originalData.length === 0) {
-      chart.crosshair.originalXRange.max = chart.options.scales.x.max;
+    if (chart.options.scales[xAxisName].max && chart.crosshair.originalData.length === 0) {
+      chart.crosshair.originalXRange.max = chart.options.scales[xAxisName].max;
     }
 
     if (!chart.crosshair.button) {
       // add restore zoom button
       var button = document.createElement('button');
 
-      var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText')
-      var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass')
+      var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText');
+      var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass');
 
       var buttonLabel = document.createTextNode(buttonText);
       button.appendChild(buttonLabel);
@@ -373,15 +376,15 @@ export default {
     }
 
     // set axis scale
-    chart.options.scales.x.min = start;
-    chart.options.scales.x.max = end;
+    chart.options.scales[xAxisName].min = start;
+    chart.options.scales[xAxisName].max = end;
 
     // make a copy of the original data for later restoration
 
     var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
 
 
-    var filterDataset = (xScaleOptions.type !== 'category')
+    var filterDataset = (xScaleOptions.type !== 'category');
 
     if(filterDataset) {
 
@@ -403,7 +406,7 @@ export default {
 
           var oldData = sourceDataset[oldDataIndex];
           // var oldDataX = this.getXScale(chart).getRightValue(oldData)
-          var oldDataX = oldData.x !== undefined ? oldData.x : NaN
+          var oldDataX = oldData.x !== undefined ? oldData.x : NaN;
 
           // append one value outside of bounds
           if (oldDataX >= start && !started && index > 0) {
@@ -434,7 +437,7 @@ export default {
       chart.crosshair.max = xAxes.max;
     }
 
-    chart.crosshair.ignoreNextEvents = 2 // ignore next 2 events to prevent starting a new zoom action after updating the chart
+    chart.crosshair.ignoreNextEvents = 2; // ignore next 2 events to prevent starting a new zoom action after updating the chart
 
     chart.update('none');
 
