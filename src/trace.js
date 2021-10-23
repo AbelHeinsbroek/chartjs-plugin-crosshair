@@ -34,13 +34,14 @@ export default {
 
   id: 'crosshair',
 
-  afterInit: function(chart) {
+  start: function(chart) {
     
-    if (!chart.config.options.scales.x) {
-      return
+    const xScaleOptions = chart.config.options.scales.x || chart.config.options.scales.xAxes;
+    if (!xScaleOptions) {
+      return;
     }
 
-    var xScaleType = chart.config.options.scales.x.type
+    var xScaleType = xScaleOptions.type
 
     if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') {
       return;
@@ -167,13 +168,15 @@ export default {
 
   afterEvent: function(chart, event) {
 
-    if (chart.config.options.scales.x.length == 0) {
-      return
+    const xScaleOptions = chart.config.options.scales.x || chart.config.options.scales.xAxes;
+
+    if (xScaleOptions.length == 0) {
+      return;
     }
 
     let e = event.event
 
-    var xScaleType = chart.config.options.scales.x.type
+    var xScaleType = xScaleOptions.type
 
     if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
       return;
@@ -328,7 +331,7 @@ export default {
   },
 
   doZoom: function(chart, start, end) {
-
+    const xScaleOptions = chart.config.options.scales.x || chart.config.options.scales.xAxes;
     // swap start/end if user dragged from right to left
     if (start > end) {
       var tmp = start;
@@ -378,7 +381,7 @@ export default {
     var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
 
 
-    var filterDataset = (chart.config.options.scales.x.type !== 'category')
+    var filterDataset = (xScaleOptions.type !== 'category')
 
     if(filterDataset) {
 
