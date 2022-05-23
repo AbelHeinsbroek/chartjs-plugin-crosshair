@@ -13,7 +13,8 @@ export default function(Chart) {
     afterInit: function(chart) {
       chart.sync = {
         blockNextTooltip: false,
-        group: 'a'
+        group: 'a',
+        plugin: this
       }
       this.subscribe(chart.sync.group,chart)
     },
@@ -22,7 +23,7 @@ export default function(Chart) {
       this.unsubscribe(chart)
     },
 
-    afterEvent: function(chart, evt) {
+    beforeEvent: function(chart, evt) {
       // sync!
       var e = evt.event
 
@@ -33,6 +34,7 @@ export default function(Chart) {
         e.xvalue = xScale.getValueForPixel(e.x),
         this.publish(chart, chart.sync.group, e)
       }
+      return true
     },
 
     publish: function(chart, group, e) {
@@ -50,19 +52,25 @@ export default function(Chart) {
       var xScale = this.getXScale(chart)
       if (xScale === null) { return }
 
-
       var newEvent = {
         type: e.type,
         chart: chart,
         x: xScale.getPixelForValue(e.xvalue),
         y: e.y,
+        sync: {
+          x: e.xvalue,
+          y: e.y
+        },
         native: {
-          buttons: 0
+          buttons: 0,
+          type: e.type
         },
         halt: true
       }
 
+
       chart.sync.blockNextTooltip = true
+      chart.sync.blockDraw = true
 
       chart._eventHandler(newEvent)
     },

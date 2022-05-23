@@ -89,7 +89,9 @@ export default function(Chart) {
 		},
 
 		afterEvent: function(chart, evt) {
+
 			if(!chart.crosshair) { return }
+
 
 			let e = evt.event
 
@@ -151,8 +153,8 @@ export default function(Chart) {
 				this.updateTracePoints(chart)
 			}
 
-
-			return true
+			// don't update the chart!
+			evt.changed = false
 		},
 		beforeTooltipDraw: function(chart) {
 			if(!chart.crosshair) { return }
