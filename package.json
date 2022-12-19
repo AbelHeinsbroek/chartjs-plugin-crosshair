@@ -45,6 +45,6 @@
     "yargs": "^16.2.0"
   },
   "peerDependencies": {
-    "chart.js": "^3.4.0"
+    "chart.js": "^4.0.1"
   }
 }
