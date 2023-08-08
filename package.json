@@ -22,7 +22,6 @@
     "build": "gulp build"
   },
   "devDependencies": {
-    "@vuepress/plugin-google-analytics": "^1.0.4",
     "eslint-config-chartjs": "^0.3.0",
     "eslint-plugin-es": "^4.1.0",
     "eslint-plugin-html": "^6.0.0",
