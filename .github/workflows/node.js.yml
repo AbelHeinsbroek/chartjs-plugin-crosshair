@@ -21,5 +21,5 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: Minified JavaScript bundle
-        path: dist/*.min.js
+        path: dist/*
         if-no-files-found: error

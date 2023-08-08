@@ -19,7 +19,7 @@
     "dist/*.js"
   ],
   "scripts": {
-    "build": "gulp build"
+    "build": "gulp build && gulp package"
   },
   "devDependencies": {
     "eslint-config-chartjs": "^0.3.0",
