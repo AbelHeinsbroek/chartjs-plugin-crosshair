@@ -88,7 +88,7 @@ export default {
     chart.panZoom = this.panZoom.bind(this, chart);
   },
 
-  destroy: function(chart) {
+  afterDestroy: function(chart) {
     var syncEnabled = this.getOption(chart, 'sync', 'enabled');
     if (syncEnabled) {
       window.removeEventListener('sync-event', chart.crosshair.syncEventHandler);
