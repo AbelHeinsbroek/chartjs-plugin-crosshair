@@ -152,12 +152,19 @@ export default {
     }
 
 
+    // do not transmit click events to prevent unwanted changing of synced
+    // charts. We do need to transmit an event to stop zooming on synced
+    // charts however.
+    var eventType = e.original.type == "click" ? "mousemove" : e.original.type;
+
     var newEvent = {
-      type: e.original.type == "click" ? "mousemove" : e.original.type,  // do not transmit click events to prevent unwanted changing of synced charts. We do need to transmit a event to stop zooming on synced charts however.
+      type: eventType,
       chart: chart,
       x: xScale.getPixelForValue(e.xValue),
       y: e.original.y,
       native: {
+        // ChartJS filters events to plugins by the event's native type
+        type: eventType,
         buttons: buttons
       },
       stop: true
