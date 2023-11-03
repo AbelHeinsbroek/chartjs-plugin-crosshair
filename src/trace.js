@@ -122,7 +122,7 @@ export default {
     return chart.data.datasets.length ? chart.scales[chart.getDatasetMeta(0).xAxisID] : null;
   },
   getYScale: function(chart) {
-    return chart.scales[chart.getDatasetMeta(0).yAxisID];
+    return chart.scales[chart.getDatasetMeta(0).yAxisID] || chart.scales['y'];
   },
 
   handleSyncEvent: function(chart, e) {
